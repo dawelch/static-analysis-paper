@@ -1,0 +1,44 @@
+\usepackage{acro}
+\ProvideAcroEnding{possessive}{'s}{'s}
+\ExplSyntaxOn
+\NewAcroCommand \acg{
+	\acro_possessive:
+	\acro_use:n{#1}
+}
+\ExplSyntaxOff
+\begin{acronym}
+\acro{AMO}{atomic memory operation}
+\acro{AMR}{adaptive mesh refinement}
+\acro{API}{Application Programming Interface}
+\acrodefplural{API}[APIs]{Application Programming Interfaces}
+\acro{CAF}{Coarray Fortran}
+\acro{CAS}{compare and swap}
+\acro{CPU}{central processing unit}
+\acrodefplural{CPU}[CPUs]{central processing units}
+\acrodefplural{CRDP}[CRDP]{Computational Research and Development Programs}
+\acro{DoD}{Department of Defense}
+\acro{ESSC}{Extreme Scale Systems Center}
+\acro{GCC}{GNU Compiler Collection}
+\acro{GPU}{graphics processing unit}
+\acrodefplural{GPU}[GPUs]{graphics processing units}
+\acro{HBM}{high bandwidth memory}
+\acro{HCA}{host channel adapter}
+\acro{MPI}{Message Passing Interface}
+\acro{NUMA}{non-uniform memory access}
+\acro{NVM}{non-volatile memory}
+\acro{OFA}{Open Fabrics Alliance}
+\acro{OLCF}{Oak Ridge Leadership Computing Facility}
+\acro{ORNL}{Oak Ridge National Laboratory}
+\acro{PE}{processing element}
+\acro{PGAS}{Partitioned Global Address Space}
+\acro{RDMA}{remote direct memory access}
+\acro{RMA}{remote memory access}
+\acro{SHOC}{Scalable Heterogeneous Computing}
+\acro{SIMD}{single instruction, multiple data}
+\acro{SPMD}{single program, multiple data}
+\acro{SQL}{Structured Query Language}
+\acro{UCP}{UC-Protocols}
+\acro{UCS}{UC-Services}
+\acro{UCT}{UC-Transports}
+\acro{UCX}{Unified Communication X}
+\end{acronym}
