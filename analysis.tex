@@ -1,0 +1,46 @@
+For the automated analysis, rather than developing our own tools, we relied as much as possible on existing tools and environments.
+Our general methodology was to extract data about the code directly from the compiler, insert it into tables in an \acs{SQL} database, separately run a dynamic analysis to collect periodic samples of where the application is spending time and also add it to the database, then finally run queries on the database combining the two sources of data to construct metrics on which to weigh the application's data structures.
+These points will be addressed separately in the following subsections.
+
+The desired result of this analysis is to achieve similar results to what the manual tweaking of our previous work found so that it can more realistically and scalably be applied to larger and more complex applications.
+To this end, we will compare the results from our previous work to what we achieved with our new tools to determine how well they are able to match up.
+We will then perform a reverse validation by applying the same analysis to a different and larger application that was not part of our previous work, modify the memory placement for the reported hotspots, and see how well the actual results fall in line with the expected results.
+This will be described in more detail in Section~\ref{sec:results}.
+\subsection{Static Analysis}
+%TODO: particular spec/features of fortran?
+For the static analysis, we relied on the \ac{GCC} for its support of Fortran.
+Using its plugin \acs{API}, we created a module to be loaded and run after the compiler finishes parsing the code.
+%TODO: poly
+%Additionally, it also registers a pass to be run while it's generating its GIMPLE \ac{IR} in order to get additional analysis information from the lower stages of the compiler.
+The plugin runs through all the relevant data structures representing the code to queue the data, then proceeds to dump them all to the database at once in bulk transactions.
+For the database, we used PostgreSQL for some of its advanced query support.
+\subsubsection{Dumping the Data}
+We did not attempt to create our own schema to represent the code, as it would not be necessary due to the tables not being intended as a user-facing interface.
+%TODO: no possessive acronyms... :'(
+Instead, we simply dumped out \ac{GCC}'s internal data structures such that each data structure was a table, and each member of the data structure was a column.
+%TODO: technically not all tables...mention enums?
+Common to all tables are two columns for the pointer to the data structure in memory during compilation, and a build ID unique to each individual invocation of the compiler.
+%TODO: necessary to very briefly explain primary/foreign keys, etc, or are they sufficiently self-describing?
+Together, these two fields form the table's composite primary key to uniquely identify each record in the database.
+Furthermore, this also allows us to dump all data in the most straightforward of manners - primitive types get dumped as their corresponding \acs{SQL} data type, and pointers to other objects as the raw value of those pointers.
+\subsubsection{Querying the Database}
+Due to the way we identify records and store object references, we are able to use any columns representing pointers as foreign keys with which to join connected tables in the database.
+The first and most important thing we need the database to do for us is find and count all references to memory in the code.
+Much of our focus on the static analysis is on the level of line numbers, so our queries were constructed so as to identify memory accesses and relate them to those line numbers.
+In particular, we go through each statement and look up which file and lines they span using the line map table, traverse the expression trees for those statements, filter for expressions containing references to the symbol table, then finally check the symbol table to determine which particular symbols are being referenced.
+In this way, we are then able construct queries to tally the total number of references for every symbol referenced across any subset of lines.
+%TODO: poly
+\subsection{Dynamic Analysis}
+%TODO: cite map?
+For the dynamic analysis, we used the ARM MAP sampling based profiler.
+Given a sample frequency and number of samples, it periodically probes the application for a set of predetermined metrics, then gathers the samples together to dump them out to an \acs{XML} file.
+What we are interested in here is simply where each thread is at in the code at the time of sampling, specifically the file and line number for the deepest frame of the stack.
+We process the \acs{XML} file to extract this information via \ac{XSLT} to produce a \acs{CSV} file with the fields we want, and then upload it to the database so that we can achieve a count of how many times any given line is observed being executed by a thread.
+We use this simple metric to determine in what regions of code the application is spending most of its time, so that we may focus only upon those regions.
+\subsection{Combined Analysis}
+The real value of the analysis comes when combining the previously described static and dynamic aspects into a more comprehensive evaluation of the code.
+Using the results from MAP, we focus only on the subset of lines we recorded samples from, and use the information from the static analysis to obtain the symbols and their reference totals across those lines.
+We treat all references as equal, with no regard as to whether they are read or write accesses or what level of the memory hierarchy their current/local value may be stored in at the time of access.
+After we have all the reference count totals, we further sum all the totals and determine what percent of that total each symbol constitutes.
+It is this percentage we use to determine the relative impact on memory performance in lieu of the benefit factor from our previous work as described in Section~\ref{sec:prevwork}.
+%TODO: poly
