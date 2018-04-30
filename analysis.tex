@@ -1,4 +1,5 @@
 For the automated analysis, rather than developing our own tools, we relied as much as possible on existing tools and environments.
+%TODO -- you need to explain what information are you extracting from the compiler --- you need to mention that you are extracting the Abstract Syntax Tree, and what other analysis and that you are leverging from gfortran intermediate representation data structures, where you are making a bridge from the intermediate program representation to SQL.
 Our general methodology was to extract data about the code directly from the compiler, insert it into tables in an \acs{SQL} database, separately run a dynamic analysis to collect periodic samples of where the application is spending time and also add it to the database, then finally run queries on the database combining the two sources of data to construct metrics on which to weigh the application's data structures.
 These points will be addressed separately in the following subsections.
 
@@ -9,6 +10,7 @@ This will be described in more detail in Section~\ref{sec:results}.
 \subsection{Static Analysis}
 %TODO: particular spec/features of fortran?
 For the static analysis, we relied on the \ac{GCC} for its support of Fortran.
+%This seems to be not very interesting for the paper -- this is just mechanics (Loading a module)
 Using its plugin \acs{API}, we created a module to be loaded and run after the compiler finishes parsing the code.
 %TODO: poly
 %Additionally, it also registers a pass to be run while it's generating its GIMPLE \ac{IR} in order to get additional analysis information from the lower stages of the compiler.
