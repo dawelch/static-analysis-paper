@@ -5,3 +5,55 @@ CoMerge assumes a hybrid system with two memory components, \textit{FastMem} and
 Given this priority order, CoMerge proposes a memory sharing schema, where data object orderings of collocated applications are merged into a global order. Then objects are allocated in FastMem until full capacity, following that global order, prior to the actual application execution. This schema is able to maximize the utilization of the memory hardware, compared to static partitioning divisions. More importantly, CoMerge ensures that  the critical to performance data objects across all applications are prioritized for FastMem allocations, leading to performance improvements across all collocated applications. Therefore, CoMerge highlights a representative use case, where the utilization of data object level information enables clever placement decisions in a hybrid memory system.
 
 However, this manual exploration of data object level impact to performance is feasible either for applications with a small number of objects, or via the expertise and effort of programmers that have contributed to the application development. This is the reason why in this work we aim to automate this process through compiler assisted techniques. 
+
+Feedback optimizations are a variety  of techniques that aim to improve
+the execution behavior of a program based on information on its current or
+previous runtime behavior. Runtime
+information, which may be specific to a given instance of a program's
+execution, helps the compiler direct its efforts to frequently
+executed regions of code and make better judgements on what set of
+optimizations can  improve the code.  There is a large body of work, including
+our own, that  focuses on offline optimizations. Systems such as GEM,
+IMPACT, SUIF, OpenUH, DCPI, FX!32 Morph, GCC, Alpha Compaq Compilers, SGI compilers, PROMISE
+perform high-level and object-level optimizations. Typical optimizations include 
+feedback directed inlining, partial dead code elimination, 
+instruction scheduling, code reordering and loop optimizations. 
+Several sets of  runtime information based on training sets of input data may be used to characterize the typical runtime behavior of the application. 
+A disadvantage of offline feedback optimization is that it recompiles the application based on the training set. Some of these
+systems rely on profiling in which the data is agregated across multiple runs making the optimization 
+less specialized.
+%A plus point: can do a lot of performance gathering 
+
+However, feedback optimizations are not limited to post mortem
+optimizations.
+%, such is the case of applications that adapts at runtime via parameritations or multiversioning, or partially compiled applications need to generate or reoptimize code on the fly.  
+Online feedback optimizations are attractive because they are less time consuming for the user, and may lead to specialized versions of code for the specific execution context. 
+%Didn't understand this point: The work of user-initiated recompilation, data gathering, source code modification, is leveraged.
+There has been extensive research on using the runtime environment to
+dynamically guide the compilation and execution of programs. Much of this work
+has been carried out in the context of virtual machine technologies, typically
+those supporting the Java programming language and C.  In general, the runtime
+environment receives a statically compiled program which may be in a native
+representation, or, as with the Java virtual machine, it may be in an
+intermediate format (e.g. Java bytecode) for portability and/or to retain
+desired semantic information.  In the latter case, it must be translated to
+the native code either using an interpreter or (more commonly) a Just in Time
+(JIT) compiler.  In some implementations, some portions of the program are
+statically predicted to rarely execute; these may remain uncompiled to save
+time and space. A mechanism would then have to be in place to generate this
+code at runtime if necessary.
+
+Systems such as  Jalapeno, HotSpot, JavaVMs, rely on feedback 
+information during runtume to generate or reoptimize code on the fly. 
+Other systems focus on online code reoptimizations via software with the  
+help of hardware. Dynamo, Cursoe, IA32EL, PIN, reoptimize
+object code and stOMP, ADAPT, Tempo, DyC,'C all create specialized versions 
+of the code during runtime.
+ 
+A common strategy for online feedback optimization is to selectively recompile
+identified "hot spots" with more aggressive optimizations.  Because programs
+generally spend the majority of their execution time in a relatively small
+fraction of the code, the typical selection procedure is to determine and
+target the available optimizations towards these "hot spots" in the running
+program.  Developing techniques for selecting hot spots and performing the
+optimizations in an efficient manner is an important research area.

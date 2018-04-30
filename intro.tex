@@ -1,5 +1,6 @@
 As we move toward exascale environments, memory hierarchies are becoming increasingly complex and heterogenous and they are expected to become even more so in the future.
-%TODO: "compute in memory"?
+%TODO: "compute in memory" 
+%TODO: "How much of these memories are exposed via the programming model? Do we want that? or do we want to keep the programming models "intact" and just add implicit hints to control the placement of variables to different types of memories. If so, would a tool like this one help? This will definately provide less restructuring. 
 Though we know that such new memory technologies like \ac{HBM} and \ac{NVM} require novel approaches to application design, what is less clear is how to address the new architectures featuring them to optimally make use of these technologies or how to efficiently implement such strategies portably.
 Furthermore, considering the potentially costly process of redesigning applications in addition to the number and size of applications in need of being updated, it is unrealistic to give equal attention to and fully redesign everything.
 As such, we must address efficiency with respect to development resources as well as runtime performance.
@@ -8,9 +9,12 @@ As such, we must address efficiency with respect to development resources as wel
 There are a number of efforts toward producing new tools, libraries, and models that reduce the burden on the application developers with respect to managing these new architectures, but we will not be covering that angle.
 Instead, we will be focusing on a minimally intrusive, low overhead method of identifying memory intensive regions of code so that developers may make better decisions regarding what parts of the application to focus their efforts on.
 Typical performance analysis of applications via tools often focuses on computational, network, and I/O resources, however this is no longer adequate for determining how to achieve the greatest use of these new memory hierarchies.
+%I think this sentence needs to say analysis to place the data to different memories -- place data structure X to memory Y. You need to mention this in this sentence.
 Instead, the focus will increasingly need to shift toward analysing applications from the point of how data structures are being used or accessed, and to this end we look to methods of determining memory hotspots in algorithms and data structures.
 
+%Can you put what compiler analysis: examples are loopnest analysis - polyhedral, data structure accesses (what data you are accessing in loops and how), variable information (types of variables such as arrays, # dimensions, etc), static analysis on the shapes of data structures and iteration spaces.  
 We have created a way of performing static analysis of code by exporting information directly from the compiler into a relational database that we may later query.
+%Dyanmic information in reality is sample based profiling, where with samples we can determine which statements are more time consuming on a program. 
 We then combine this database with information obtained through traditional dynamic analysis tools in order to find performance critical allocations in an automated fashion.
 The goal is to determine with as great an accuracy as possible which data structures influence application performance the most so that the developer may make better decisions with respect to data placement.
 As we have previously explored this problem in a manual fashion (see section~\ref{sec:prevwork})\cite{Doudali:2017:CTE:3132402.3132418}, this work will focus on recreating the results we found by hand with the analysis tools described in this paper.

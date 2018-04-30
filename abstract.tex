@@ -1,8 +1,13 @@
-As we move to Exascale systems, memory hierarchies are becoming increasingly complex and heterogenous and they are expected to become even more so in the future because of power considerations. These include new memory technologies like high bandwidth memories (HBM), non-volatile memories (NVRAM), DRAM, Compute in Memory (CIM), etc.
-This introduces the difficult problem of addressing how to optimally make use of these hierarchies, how to organize them (as caches or user-managed or both) in hardware or to what level we want to expose these features to the programming models, as well as how to efficiently  implement such strategies that are efficient and portable.
-Typical performance analysis of applications via tools often focuses on processor and network, I/O resources, however this is no longer adequate for determining how to achieve the greatest use (e.g. maximize the bandwidth) of these emerging memory architectures. Instead, the focus will increasingly need to shift toward analyzing applications from the point on how data structures are being used or accesses, and to this end we look to methods of determining 
-hotspots in algorithms and data structures.
+As we move to Exascale systems, memory hierarchies are becoming increasingly complex and heterogenous and they are expected to become even more so in 
+the future because of power considerations. These include new memory technologies like high bandwidth memories (HBM), non-volatile memories (NVRAM), 
+DRAM, Compute in Memory (CIM), etc.
+This introduces the difficult problem of addressing how to optimally make use of these hierarchies, how to organize them (as caches or user-managed or both) in 
+hardware or to what level we want to expose these features to the programming models, as well as how to efficiently  implement such strategies that are efficient 
+and portable.
+Typical performance analysis of applications via tools often focuses on processor and network, I/O resources, however this is no longer adequate for determining 
+how to achieve the greatest use (e.g. maximize the bandwidth) of these emerging memory architectures. Instead, the focus will increasingly need to shift toward 
+analyzing applications from the point on how data structures are being used or accesses, and to this end we look to methods of determining 
+hotspots in algorithms and data structures. 
 We have created a way of performing static analysis of code via exporting information directly from the compiler into a relational 
-database that we may later query.
-We propose combining this database with information obtained through traditional dynamic analysis tools in order to find 
+database that we may later query. We propose combining this database with information obtained through traditional dynamic analysis tools in order to find 
 performance critical allocations in an automated fashion.
