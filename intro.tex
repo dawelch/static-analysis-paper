@@ -1,13 +1,12 @@
-As we move toward exascale environments, memory hierarchies are becoming increasingly complex and heterogenous and they are expected to become even more so in the future.
+As we move toward exascale systems, memory hierarchies are becoming increasingly complex and heterogenous and they are expected to become even more so in the future.
 %TODO: "compute in memory" 
 %TODO: "How much of these memories are exposed via the programming model? Do we want that? or do we want to keep the programming models "intact" and just add implicit hints to control the placement of variables to different types of memories. If so, would a tool like this one help? This will definately provide less restructuring. 
-Though we know that such new memory technologies like \ac{HBM} and \ac{NVM} require novel approaches to application design, what is less clear is how to address the new architectures featuring them to optimally make use of these technologies or how to efficiently implement such strategies portably.
-Furthermore, considering the potentially costly process of redesigning applications in addition to the number and size of applications in need of being updated, it is unrealistic to give equal attention to and fully redesign everything.
-As such, we must address efficiency with respect to development resources as well as runtime performance.
+Though we know that such new memory technologies like \ac{HBM} and \ac{NVM} require novel approaches to application design, what is less clear is how to address the new architectures featuring them to optimally make use of these technologies or how to efficiently implement such strategies portably using programming models.
+Furthermore, considering the potentially costly process of porting applications we need to explore semi or full automated approaches to optimize existing codes written using defacto programming models.
 
 %TODO: insert references here
-There are a number of efforts toward producing new tools, libraries, and models that reduce the burden on the application developers with respect to managing these new architectures, but we will not be covering that angle.
-Instead, we will be focusing on a minimally intrusive, low overhead method of identifying memory intensive regions of code so that developers may make better decisions regarding what parts of the application to focus their efforts on.
+There are a number of efforts toward extending libraries, and programming models that reduce the burden on the application developers with respect to managing these new architectures, but we will not be covering that angle. 
+Instead, we will be focusing on  minimally intrusive, low overhead methods (implemented via tools) for identifying memory intensive regions of code so that developers may make better decisions regarding what parts of the application to focus their efforts on.
 Typical performance analysis of applications via tools often focuses on computational, network, and I/O resources, however this is no longer adequate for determining how to achieve the greatest use of these new memory hierarchies.
 %I think this sentence needs to say analysis to place the data to different memories -- place data structure X to memory Y. You need to mention this in this sentence.
 Instead, the focus will increasingly need to shift toward analysing applications from the point of how data structures are being used or accessed, and to this end we look to methods of determining memory hotspots in algorithms and data structures.
