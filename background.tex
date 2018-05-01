@@ -1,5 +1,17 @@
 %TODO: themes - portability, scalability
 %TODO: not sure if these are the best citations here, and/or need more static analysis references, perhaps for a couple other non-compiler forms of static analysis? language/design related?
+%TODO: This looks starting from sequential code
+%TODO: Challenge is calculating system dependences: control flow, data flow, loop dependences -- all with alias analysis and array section analysis.
+%TODO: Its hard today as there are limitations for these types of analysis: inter-procedural information -- how to propagate information across procedures through arguments or globals, etc.
+%TODO: This gets even harder for parallel analysis where there are memory syncrhonizations, SPMD executions (threads taking different branches, etc).
+%TODO: Historically, compilers optimize better loops or apply loop transformations rather than data structure optimizations because
+%TODO: they tend to be more localized. 
+%TODO: Early successes has been using sequential analysis to parallelize via automatic vectorization but this only focus on inner loops
+%TODO: This has demostrated the importance of good dependence analysis and also good cost-models to measure the profitability of SIMD.
+%TODO: To improve this, we need to look at optimizing using runtime information. This includes feedback directed optimizations (online and offload), where runtime functional data of the program is calcuated (frequency, value or phased behavior) to detect
+%TODO: Hotspots of the code. Little of these feedback optimizaitons has focus on memory accesses. 
+
+
 Research on static analysis of code has a very long history and has both taken many forms and addressed innumerable problem domains\cite{Andrade:2012:SAW:2355585.2355593}\cite{1194988}.
 Our focus on utilising the compiler for our static analysis means that we can benefit from the dearth of both static analysis as well as compiler research.
 Compilers face many difficult challenges in transforming code while ensuring that the meaning of the code has not been changed.
