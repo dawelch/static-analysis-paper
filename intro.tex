@@ -5,17 +5,16 @@ Though we know that such new memory technologies like \ac{HBM} and \ac{NVM} requ
 Furthermore, considering the potentially costly process of porting applications we need to explore semi or full automated approaches to optimize existing codes written using defacto programming models.
 
 %TODO: insert references here
-There are a number of efforts toward extending libraries, and programming models that reduce the burden on the application developers with respect to managing these new architectures, but we will not be covering that angle. 
-Instead, we will be focusing on  minimally intrusive, low overhead methods (implemented via tools) for identifying memory intensive regions of code so that developers may make better decisions regarding what parts of the application to focus their efforts on.
+Our approach is different. Instead of focusing on extending programming models to abstract the 
+complexity of these new architectures, we focus on  minimally intrusive, low overhead methods (implemented via tools) for identifying memory intensive regions of code so that developers may make better decisions regarding what parts of the application to focus their efforts on.
 Typical performance analysis of applications via tools often focuses on computational, network, and I/O resources, however this is no longer adequate for determining how to achieve the greatest use of these new memory hierarchies.
 %I think this sentence needs to say analysis to place the data to different memories -- place data structure X to memory Y. You need to mention this in this sentence.
-Instead, the focus will increasingly need to shift toward analysing applications from the point of how data structures are being used or accessed, and to this end we look to methods of determining memory hotspots in algorithms and data structures.
+Instead, the focus will increasingly need to shift toward analysing applications from the point of how data structures are being accessed, and to this end we look to scalable methods of determining memory hotspots in algorithms and data structures.
 
 %Can you put what compiler analysis: examples are loopnest analysis - polyhedral, data structure accesses (what data you are accessing in loops and how), variable information (types of variables such as arrays, # dimensions, etc), static analysis on the shapes of data structures and iteration spaces.  
-We have created a way of performing static analysis of code by exporting information directly from the compiler into a relational database that we may later query.
-%Dyanmic information in reality is sample based profiling, where with samples we can determine which statements are more time consuming on a program. 
-We then combine this database with information obtained through traditional dynamic analysis tools in order to find performance critical allocations in an automated fashion.
-The goal is to determine with as great an accuracy as possible which data structures influence application performance the most so that the developer may make better decisions with respect to data placement.
+We have created a way of performing static analysis of code by exporting translating the intermediate representation from the compiler into a relational database that we may later query. %Dyanmic information in reality is sample based profiling, where with samples we can determine which statements are more time consuming on a program. 
+We then combine this database with information obtained through performance sampling tools to find performance critical allocations in an automated fashion.
+The goal is to determine with as great an accuracy as possible which data structures influence application performance the most so that the developer may make better decisions with respect to their data placement in memory.
 As we have previously explored this problem in a manual fashion (see section~\ref{sec:prevwork})\cite{Doudali:2017:CTE:3132402.3132418}, this work will focus on recreating the results we found by hand with the analysis tools described in this paper.
 Furthermore, this work is currently focused on the analysis of Fortran code for simplicity, though it can be applied in much the same way to C/C++.
 
