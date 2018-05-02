@@ -843,7 +843,7 @@ to0pt{\kern0.55\wd0\vrule height0.45\ht0\hss}\box0}}}}
 \def\clearheadinfo{\gdef\@author{No Author Given}%
                    \gdef\@title{No Title Given}%
                    \gdef\@subtitle{}%
-                   \gdef\@institute{No Institute Given}%
+                   \gdef\@institute{}%No Institute Given}%
                    \gdef\@thanks{}%
                    \global\titlerunning={}\global\authorrunning={}%
                    \global\toctitle={}\global\tocauthor={}}
@@ -950,18 +950,18 @@ to0pt{\kern0.55\wd0\vrule height0.45\ht0\hss}\box0}}}}
        \xdef\@title{\copy\titrun}%
     \fi
 %
-    \if!\the\tocauthor!\relax
-      {\def\and{\noexpand\protect\noexpand\and}%
-       \def\inst##1{}%    added MR 2017-09-20 to remove inst numbers from the TOC
-       \def\orcidID##1{}% added MR 2017-09-20 to remove ORCID ids from the TOC
-      \protected@xdef\toc@uthor{\@author}}%
-    \else
-      \def\\{\noexpand\protect\noexpand\newline}%
-      \protected@xdef\scratch{\the\tocauthor}%
-      \protected@xdef\toc@uthor{\scratch}%
-    \fi
+%    \if!\the\tocauthor!\relax
+%      {\def\and{\noexpand\protect\noexpand\and}%
+%       \def\inst##1{}%    added MR 2017-09-20 to remove inst numbers from the TOC
+%       \def\orcidID##1{}% added MR 2017-09-20 to remove ORCID ids from the TOC
+%      \protected@xdef\toc@uthor{\@author}}%
+%    \else
+%      \def\\{\noexpand\protect\noexpand\newline}%
+%      \protected@xdef\scratch{\the\tocauthor}%
+%      \protected@xdef\toc@uthor{\scratch}%
+%    \fi
     \addtocontents{toc}{\noexpand\protect\noexpand\authcount{\the\c@auco}}%
-    \addcontentsline{toc}{author}{\toc@uthor}%
+%    \addcontentsline{toc}{author}{\toc@uthor}%
     \if@runhead
        \if!\the\authorrunning!
          \value{@inst}=\value{@auth}%
