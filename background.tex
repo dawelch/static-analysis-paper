@@ -36,13 +36,13 @@ Here, the focus is on a subset of loop nests referred to as \acp{SCoP}\cite{TBas
 
 Feedback optimizations are a variety  of techniques that aim to improve
 the execution behavior of a program based on information on its current or
-previous runtime behavior. Runtime
+previous runtime behavior\cite{Smith:2000:OCF:351403.351408}. Runtime
 information, which may be specific to a given instance of a program's
 execution, helps the compiler direct its efforts to frequently
 executed regions of code and make better judgements on what set of
 optimizations can  improve the code.  There is a large body of work, including
-our own, that  focuses on offline optimizations. Systems such as GEM,
-IMPACT, SUIF, OpenUH, DCPI, FX!32 Morph, GCC, Alpha Compaq Compilers, SGI compilers, PROMISE
+our own\cite{10.1007/978-3-540-68555-5_22}, that  focuses on offline optimizations. Systems such as GEM,
+IMPACT, SUIF, OpenUH, DCPI, FX!32 Morph, GCC, Alpha Compaq Compilers, SGI compilers, and PROMISE
 perform high-level and object-level optimizations. Typical optimizations include
 feedback directed inlining, partial dead code elimination,
 instruction scheduling, code reordering and loop optimizations.
@@ -51,8 +51,6 @@ A disadvantage of offline feedback optimization is that it recompiles the applic
 systems rely on profiling in which the data is agregated across multiple runs making the optimization
 less specialized.
 %A plus point: can do a lot of performance gathering
-fdo\cite{Smith:2000:OCF:351403.351408}
-fdo/instrumentation for mpi/openmp\cite{10.1007/978-3-540-68555-5_22}
 
 However, feedback optimizations are not limited to post mortem
 optimizations.
@@ -73,7 +71,7 @@ statically predicted to rarely execute; these may remain uncompiled to save
 time and space. A mechanism would then have to be in place to generate this
 code at runtime if necessary.
 
-Systems such as  Jalapeno\cite{Alpern:2000:JVM:1011388.1011400}, HotSpot, JavaVMs, rely on feedback
+Systems such as  Jalapeno\cite{Alpern:2000:JVM:1011388.1011400}, HotSpot, and JavaVMs rely on feedback
 information during runtume to generate or reoptimize code on the fly.
 Other systems focus on online code reoptimizations via software with the
 help of hardware. Dynamo, Cursoe, IA32EL, PIN, reoptimize
@@ -81,19 +79,18 @@ object code and stOMP, ADAPT\cite{Voss:2001:HAP:568014.379583}, Tempo, DyC,'C al
 of the code during runtime.
 
 A common strategy for online feedback optimization is to selectively recompile
-identified "hot spots" with more aggressive optimizations.  Because programs
+identified ``hot spots'' with more aggressive optimizations.  Because programs
 generally spend the majority of their execution time in a relatively small
 fraction of the code, the typical selection procedure is to determine and
-target the available optimizations towards these "hot spots" in the running
+target the available optimizations towards these ``hot spots'' in the running
 program.  Developing techniques for selecting hot spots and performing the
 optimizations in an efficient manner is an important research area.
 
 %TODO: talk about vectorisation?  or...?
 
-polyhedral predictive modeling\cite{park.13.ijpp}
-trace-based vectorisation potential\cite{holewinski.12.pldi}
-machine learning for auto-vectorisation\cite{stock.12.taco}
-cost model\cite{5608348}
+%polyhedral predictive modeling\cite{park.13.ijpp}
+%trace-based vectorisation potential\cite{holewinski.12.pldi}
+%machine learning for auto-vectorisation\cite{stock.12.taco}
 
 %TODO: what level of detail to go into dynamic analysis?  I don't really have as much on that side and am at a bit of a loss for what should be discussed here
 
