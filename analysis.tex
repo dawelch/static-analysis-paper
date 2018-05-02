@@ -2,6 +2,7 @@ For the automated analysis, rather than developing our own tools, we relied as m
 %TODO -- you need to explain what information are you extracting from the compiler --- you need to mention that you are extracting the Abstract Syntax Tree, and what other analysis and that you are leverging from gfortran intermediate representation data structures, where you are making a bridge from the intermediate program representation to SQL.
 Our general methodology was to extract data about the code directly from the compiler, insert it into tables in an \acs{SQL} database, separately run a dynamic analysis to collect periodic samples of where the application is spending time and also add it to the database, then finally run queries on the database combining the two sources of data to construct metrics on which to weigh the application's data structures.
 These points will be addressed separately in the following subsections.
+While we include components of a dynamic analysis in this way, we primarily emphasise the static analysis so as to reason about the code in as machine independent of a manner as possible for optimal performance portability, with the dynamic analysis used to focus more specifically on regions of particular interest and supplement the functional data obtained from the compiler with additional non-functional data.
 
 The desired result of this analysis is to achieve similar results to what the manual tweaking of our previous work found so that it can more realistically and scalably be applied to larger and more complex applications.
 To this end, we will compare the results from our previous work to what we achieved with our new tools to determine how well they are able to match up.
@@ -14,7 +15,7 @@ For the static analysis, we relied on the \ac{GCC} for its support of Fortran.
 Using its plugin \acs{API}, we created a module to be loaded and run after the compiler finishes parsing the code.
 %TODO: poly
 %Additionally, it also registers a pass to be run while it's generating its GIMPLE \ac{IR} in order to get additional analysis information from the lower stages of the compiler.
-The plugin runs through all the relevant data structures representing the code to queue the data, then proceeds to dump them all to the database at once in bulk transactions.
+The plugin runs through all the relevant data structures in the \ac{AST} representing the code to queue the data, then proceeds to dump them all to the database at once in bulk transactions.
 For the database, we used PostgreSQL for some of its advanced query support.
 \subsubsection{Dumping the Data}
 We did not attempt to create our own schema to represent the code, as it would not be necessary due to the tables not being intended as a user-facing interface.
