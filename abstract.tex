@@ -2,5 +2,5 @@ In moving toward exascale environments, memory hierarchies are becoming increasi
 This introduces the difficult problem of addressing how to optimally make use of these hierarchies as well as how to efficiently implement such strategies.
 Typical performance analysis of applications often focuses on compute and I/O resources, however this is no longer adequate for determining how to achieve the greatest use of these emerging architectures.
 Instead, the focus will increasingly need to shift toward analysing memory use, and to this end we look to methods of determining hotspots in algorithms and data structures.
-We have created a way of performing static analysis by translating a high level compiler intermediate representation (abstract syntax tree) to a relational database that we may later query.
+We have created a way of performing static analysis by translating a high level compiler \acl{IR} (specifically, the \acl{AST}) to a relational database that we may later query.
 We propose combining this database with information obtained through a traditional dynamic analysis tool in order to predict performance critical allocations in an automated and performance portable fashion.
