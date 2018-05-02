@@ -31,7 +31,19 @@ The first and most important thing we need the database to do for us is find and
 Much of our focus on the static analysis is on the level of line numbers, so our queries were constructed so as to identify memory accesses and relate them to those line numbers.
 In particular, we go through each statement and look up which file and lines they span using the line map table, traverse the expression trees for those statements, filter for expressions containing references to the symbol table, then finally check the symbol table to determine which particular symbols are being referenced.
 In this way, we are then able construct queries to tally the total number of references for every symbol referenced across any subset of lines.
-%TODO: poly
+
+%TODO: more poly?
+In order to enhance the predictive capacity of our analysis, we look to polyhedral analysis by utilising \acsp{GCC} Graphite framework\cite{trifunovic:inria-00551516}.
+At this time, our use of the polytopes provided by Graphite is simply to do some basic reasoning about memory access order for arrays - notably, to find cases where a particular access is likely to result in either a greater or lesser number of cache misses than a typical in order access pattern.
+
+We classify accesses into three categories based on a focus on the relation to the domain of the innermost loop.
+For loops with iterators \texttt{i}, \texttt{j}, \texttt{k}, in that order, we refer to these categories as follows: the \texttt{[k][j]} class, the \texttt{[j][k]} class, and the \texttt{[j][i]} class.
+In all cases, what we are really trying to address is the use of the innermost loop's iterator, or the lack thereof, so this is intended to serve as a simplification in that \texttt{j} is the "same" as \texttt{k + i} or \texttt{k - 1}.
+Since Fortran indexes arrays in a column-major order, this means that the first \texttt{[k][j]} class is intended to represent accesses that are presumed to be both in order in memory and reasonably close in proximity between iterations, if not contiguous.
+Similarly, the second \texttt{[j][k]} class represents the case where for sufficiently large data objects a new cache block may need to be fetched from memory for each iteration of the innermost loop, resulting in degraded performance compared to the first class.
+Finally, the final \texttt{[j][i]} class is intended to represent the cases where the memory location being accessed remains constant throughout the entire innermost loop, only changing as often as any relevant enclosing loop iterates and thus carrying the expectation of being even slightly less expensive than the first class.
+%TODO: reference this cost model paper in some way?
+With these classifications, we can then weigh each access observed for a sample more or less based on the access type to create a cost model for our analysis.%\cite{5608348}
 \subsection{Dynamic Analysis}
 %TODO: cite map?
 For the dynamic analysis, we used the ARM MAP sampling based profiler.
