@@ -2,7 +2,7 @@
 Future exascale environments need intelligent data management across the heterogeneous memory components, so as to maximise application performance.
 For that reason, it is necessary to be able to understand the impact of accessing each data object to the application runtime.
 This knowledge enables efficient data placement and migration decisions.
-To that extent, CoMerge \cite{Doudali:2017:CTE:3132402.3132418} is a memory sharing schema that maximizes the hardware utilisation and performance across collocated applications, via prioritising allocations of data objects whose access rate and pattern greatly impacts the runtime.
+To that extent, CoMerge \cite{Doudali:2017:CTE:3132402.3132418} is a memory sharing schema that maximises the hardware utilisation and performance across collocated applications, via prioritising allocations of data objects whose access rate and pattern greatly impacts the runtime.
  
 CoMerge assumes a hybrid system with two memory components, \textit{FastMem} and \textit{SlowMem}, where the second one is configured to have 0.2x the bandwidth and 5x the latency of the first one, which is a representative difference of DRAM and \ac{NVM} technologies, respectively.
 Thus, in such a system, where dataset sizes span allocations across the different memory components, there will be an application performance slowdown from the ideal case, where all data could be serviced from FastMem.
