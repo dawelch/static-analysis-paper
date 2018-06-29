@@ -285,10 +285,17 @@ Aaron Welch, Oscar Hernandez,\\Thaleia Dimitra Doudali, Ada Gavrilovska,\\Barbar
 \begin{itemize}
 \item Tests were run on five of the benchmarks from PolyBench - adi, doitgen, fdtd-2d, jacobi-2d-imper, and trmm
 \item PolyBench is a collection of benchmarks with static control flow, extracted from operations in various domains including linear algebra, image processing, and physics simulations
-%TODO taking this stuff out?
-%\item Possible to enhance analysis by using polyhedral analysis
+%TODO taking this stuff out? well crap, I can't as it's too computationally expensive to recompute at this point with my prior methods
 \item All tests were run with a single processor and thread
 \item Timing results from our manual analysis were adjusted such that they were also relative to that of the test run with the slowest performance
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - Imitating CoMerge}
+\begin{itemize}
+\item Possible to enhance analysis by using polyhedral analysis, assign ``weight'' based on access order with respect to array indices
+\item For out of order access, assign 2x weight penalty
+\item For accesses where innermost loop accesses a constant value, reduce weight by 75\%
 \end{itemize}
 \end{frame}
 
@@ -381,23 +388,25 @@ a & 0.04 & 0.40 \\
 \item We start by using the same process used in our PolyBench analysis to tally all occurrences of each symbol
 \item We filter based upon symbols being referenced within a few of the top functions of interest that we want to analyse
 \item We further select based upon which symbols seen are within openmp parallel and parallel do sections
+\item In an idealised situation, the reference count for each symbol in a parallel section should remain roughly the same for any number of threads (with the counts simply distributed across threads)
+\item Increases to the total reference count for a symbol may indicate a performance issue
 \end{itemize}
 \end{frame}
 
 \begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - CP2K DFT}
 \begin{center}
-\includegraphics{images/cp2k-omp-counts.pdf}
+\includegraphics{images/cp2k-omp-inc-full.pdf}
 \end{center}
 \begin{itemize}
 \item Each line represents a distinct symbol
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - CP2K DFT}
-\begin{itemize}
-\item next chart(s) need to be described then placed here...once I can finally determine what they should be and obtain them...
-\end{itemize}
-\end{frame}
+%\begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - CP2K DFT}
+%\begin{itemize}
+%\item next chart(s) need to be described then placed here...once I can finally determine what they should be and obtain them...
+%\end{itemize}
+%\end{frame}
 
 \begin{frame}{\hspace{0.02\paperwidth}Conclusions}
 \begin{itemize}
