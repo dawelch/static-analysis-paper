@@ -1,0 +1,104 @@
+For the analysis, the initial goal is to replicate the results from our previous work to the extent of predicting the relative benefit of placing particular data structures in faster memory.
+As our prior work featured the PolyBench suite\cite{polybench}, we will analyse the five benchmarks we studied and compare the results.
+PolyBench is a collection of small numerical computation benchmarks exclusively containing \acp{SCoP} suitable for polyhedral analysis.
+Previously, to calculate the benefit factors of each data structure, we used the formula:
+\begin{center}
+$\text{Benefit}(O) = \frac{t(O) - S}{F - S}$
+\end{center}
+where $S$ was the time spent when all data was in slow memory, $F$ was the time spent when all data was in fast memory, and $t(O)$ was the time spent placing data object $O$ into fast memory while all other data was in slow memory.
+As we can't make comparable conclusions about the affects of changes to data placement on execution time due to many confounding variables, we instead create a new definition for the benefit factor and attempt to relate the relative predicted and actual impacts of placement of such data objects with respect to each other.
+Specifically, here we find the data object with the largest actual or predicted benefit, and calculate the fraction of actual or predicted benefit of all other data objects by this maximum value.
+This allows us to reason about the relative impacts of the discovered hotspots as they compare to each other.
+The results of this analysis showing the adjusted benefit factors for both the actual measured values and the predicted ones can be seen in Table~\ref{tbl:results}.
+%TODO: figure out a better way to refer to the "cases"...?
+Here, we use a weight factor of 2 for the \texttt{[j][k]} case described in Section~\ref{sec:analysis}, and a factor of 0.75 for the \texttt{[j][i]} case, though it is worth noting with the particular benchmarks in question, only doitgen was significantly impacted by these cases, and as such, these weights were effectively selected so as to best adjust that particular benchmark's results to the actual measurements.
+This issue will be addressed in the discussion of its results.
+
+\begin{table*}[hbt!]
+\begin{center}
+\begin{subtable}{.3\linewidth}
+\begin{tabular}{|c|c|c|}
+\hline
+Symbol & Actual & Predicted \\
+\hline\hline
+X & 1 & 0.91 \\
+\hline
+B & 0.85 & 1 \\
+\hline
+A & 0.55 & 0.77 \\
+\hline
+\end{tabular}
+\caption{adi}
+\end{subtable}
+\begin{subtable}{.3\linewidth}
+\begin{tabular}{|c|c|c|}
+\hline
+Symbol & Actual & Predicted \\
+\hline\hline
+cFour & 1 & 1 \\
+\hline
+sumA & 0.78 & 0.75 \\
+\hline
+a & 0.19 & 0.50 \\
+\hline
+\end{tabular}
+\caption{doitgen}
+\end{subtable}
+\begin{subtable}{.3\linewidth}
+\begin{tabular}{|c|c|c|}
+\hline
+Symbol & Actual & Predicted \\
+\hline\hline
+hz & 1 & 1 \\
+\hline
+ey & 0.77 & 0.72 \\
+\hline
+ex & 0.60 & 0.71 \\
+\hline
+\end{tabular}
+\caption{fdtd-2d}
+\end{subtable}
+\begin{subtable}{.3\linewidth}
+\begin{tabular}{|c|c|c|}
+\hline
+Symbol & Actual & Predicted \\
+\hline\hline
+a & 1 & 1 \\
+\hline
+b & 0.95 & 0.27 \\
+\hline
+\end{tabular}
+\caption{jacobi-2d-imper}
+\end{subtable}
+\begin{subtable}{.3\linewidth}
+\begin{tabular}{|c|c|c|}
+\hline
+Symbol & Actual & Predicted \\
+\hline\hline
+b & 1 & 1 \\
+\hline
+a & 0.04 & 0.40 \\
+\hline
+\end{tabular}
+\caption{trmm}
+\end{subtable}
+\caption{Memory Hotspot Predictions}
+\label{tbl:results}
+\end{center}
+\end{table*}
+
+The analysis results for fdtd-2d made for the most accurate predictions, without much of an observed margin of error, and the adi benchmark wasn't too far off, either.
+However, tuning the weights for doitgen proved to be challenging, both due to being still unable to adjust them so as to match the expected results as well as the inability to test the weights against other applications to determine reasonable values that could be more confidently assumed to not be tailored specifically to a particular case.
+With a greater quantity and variety of code that would similarly be affected by these weights, it would be possible to then address their assignment based upon optimising for what values provide the greatest average accuracy for the general case.
+This concern should be eased with the addition of further code for analysis beyond just what we previously tested manually, and such analysis will be covered in the full paper.
+
+The results for jacobi were notably different from reality, but upon closer inspection, it is easy to see why.
+One of the most heavily sampled lines references five different elements of the same array, and each one is being counted as a separate access each time the line is observed being executed.
+However, it can also be clearly seen that each of the indices being accessed are contiguous between iterations (i.e., the \texttt{[k][j]} case described in Section~\ref{sec:analysis}, and as such, can be expected to come from the same cache line and not result in premature cache misses.
+This can be expected to make all five accesses effectively equivalent to just one in terms of cache performance, compared to the other array in the statement which also had only one (similarly in order) access.
+Therefore, if this fact is properly accounted for in the analysis, then we should see both data objects having close to equivalent benefit factors, as the actual measurements found.
+This and other enhancements will also be featured in the full paper.
+
+%TODO: ... :(
+Finally, the predictions for trmm were by far the most drastically different from what was actually observed, and this fact is similarly the most difficult to understand even upon inspecting the code.
+Unfortunately, we are unable to explain this anomaly at this time, and it is still under investigation.
