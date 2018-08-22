@@ -1,6 +1,5 @@
-In moving toward exascale environments, memory hierarchies are becoming increasingly complex and they are expected to become even more so in the future.
-This introduces the difficult problem of addressing how to optimally make use of these hierarchies as well as how to efficiently implement such strategies.
-Typical performance analysis of applications often focuses on compute and I/O resources, however this is no longer adequate for determining how to achieve the greatest use of these emerging architectures.
-Instead, the focus will increasingly need to shift toward analysing memory use, and to this end we look to methods of analysing memory use and determining hotspots in algorithms and data structures.
-We have created a way of performing static analysis by translating a high level compiler \acl{IR} (specifically, the \acl{AST}) to a relational database that we may later query.
-We propose combining this database with information obtained through a traditional dynamic analysis tool in order to determine memory access patterns in a performance portable fashion.
+Emerging HPC platforms are becoming extraordinarily difficult to target as a result of complex, deep  and heterogeneous memory hierarchy, heterogeneous cores and need to divide work among them. Cost in terms of both power and performance of moving data across system.
+Programming models and libraries being developed or enhance to relieve work of app developer but will not be sufficient. In many cases, developer will need to modify code
+Needs information (and the right kind) to make key decisions.
+In this paper we describe a system that we are constructing in order to provide such information. Static and dynamically collected facts about a program that are stored and can be queried. Potentially usable by either a developer or a tool. This system is under construction yet several parts are already functional. 
+Show an early evaluation via a case study.

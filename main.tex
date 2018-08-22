@@ -1,4 +1,8 @@
-\documentclass{ieeeconf}
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}
+
+\IEEEoverridecommandlockouts
+\overrideIEEEmargins
+
 \usepackage{subcaption}
 \captionsetup{compatibility=false}
 \usepackage{authblk}
@@ -9,7 +13,10 @@
 \input{acros}
 
 \begin{document}
-\title{A Database for program analysis}
+%\title{A Database for program analysis}
+\title{\LARGE \bf
+A Compiler-based Tool to Query Large scale Application Source Codes*
+}
 \author[1, 2]{Aaron Welch}
 \author[1]{Oscar Hernandez}
 \author[3]{Thaleia Dimitra Doudali}
@@ -27,24 +34,24 @@
 \section{Introduction}
 \label{sec:intro}
 \input{intro}
-\section{Background/Related Work}
+\section{Background}
 \label{sec:background}
 \input{background}
-\section{Previous Work}
-\label{sec:prevwork}
-\input{prevwork}
-\section{Analysis}
+\section{Related Work}
+\label{sec:related}
+\input{related}
+\section{Source Code Analyser}
 \label{sec:analysis}
 \input{analysis}
-\section{Results}
-\label{sec:results}
-\input{results}
-\section{Conclusion}
+\section{Case Study}
+\label{sec:casestudy}
+\input{casestudy}
+\section{Conclusion and Future Work}
 \label{sec:conclusion}
 \input{conclusion}
-\section{Future Work}
-\label{sec:future}
-\input{future}
+\section*{Acknowledgements}
+\label{sec:ack}
+\input{ack}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 \end{document}
