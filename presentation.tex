@@ -122,7 +122,7 @@
 	\parbox{0.2\textwidth}{ORNL is managed by UT-Battelle\\%
 	for the US Department of Energy}%
 	\else%
-	Feedback-directed optimisations to control memory placement and affinity%
+	Static and Dynamic Program Analysis Database%
 	\fi%
 	\vspace{0.02\paperheight}%
 	\end{flushleft}%
@@ -167,45 +167,16 @@ Oak Ridge National Laboratory\\
 
 \begin{document}
 
-\begin{frame}{\hspace{0.02\paperwidth}Feedback-directed optimisations to control\\\hspace{0.02\paperwidth}memory placement and affinity on\\\hspace{0.02\paperwidth}shared memory programming models}
-Aaron Welch, Oscar Hernandez,\\Thaleia Dimitra Doudali, Ada Gavrilovska,\\Barbara Chapman
+\begin{frame}{\hspace{0.02\paperwidth}Static and Dynamic Program Analysis Database}
+Aaron Welch %, Oscar Hernandez,\\Thaleia Dimitra Doudali, Ada Gavrilovska,\\Barbara Chapman
 \end{frame}
 
 \begin{frame}{\hspace{0.02\paperwidth}Background and Motivation}
 \begin{itemize}
-\item Memory hierarchies are becoming increasingly complex and are constantly evolving
-\item It is unclear how to address placement for memory across these hierarchies
-\item As porting code can be costly, we need to explore partially or fully automated methods for identifying memory intensive regions of code and where to focus attention on porting efforts
+\item System architectures are becoming increasingly complex and are constantly evolving
+\item It is unclear how to best make use of these systems
+\item As porting code can be costly, we need to explore partially or fully automated methods for determining application behaviour and identifying particular regions of interest
 \item This work explores such a method, by combining information from the compiler with profiling data to analyse code using an \acs{SQL} database
-\end{itemize}
-\end{frame}
-
-\begin{frame}{\hspace{0.02\paperwidth}Previous Work - CoMerge}
-\begin{itemize}
-\item Memory sharing schema that maximises hardware utilisation and performance across collocated applications
-\item Focused on prioritising allocations of critical data objects across the memory hierarchy
-\item Assumes hybrid system with two memory components
-\begin{itemize}
-\item FastMem - good performance, limited space (DRAM)
-\item SlowMem - 0.2x bandwidth and 5x latency of FastMem, higher capacity (\acs{NVM})
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{\hspace{0.02\paperwidth}Previous Work - CoMerge}
-\begin{itemize}
-\item One test run for each data object being the sole resident in FastMem
-\item Performance measured by reduction from ideal case (all data in FastMem)
-\item Relative performance benefits for each data object used to create priority order ranking
-\item Objects are allocated in order of priority until FastMem exhausted
-\end{itemize}
-\end{frame}
-
-\begin{frame}{\hspace{0.02\paperwidth}Drawbacks of CoMerge}
-\begin{itemize}
-\item Not automated - each test run requires manual modification of code
-\item Not scalable - manual process becomes intractible with substantial numbers of data objects
-\item Not generic - requires developer knowledge of the code for necessary modifications
 \end{itemize}
 \end{frame}
 
@@ -221,20 +192,10 @@ Aaron Welch, Oscar Hernandez,\\Thaleia Dimitra Doudali, Ada Gavrilovska,\\Barbar
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\hspace{0.02\paperwidth}Proposed Solution}
-\begin{itemize}
-\item Benefits
-\begin{itemize}
-\item Same process is scalable to code of any size
-\item Only requires compiling and running the code once
-\item Far greater amount of information available with which to inspect and reason about the code and its performance characteristics
-\end{itemize}
-\item Drawbacks
-\begin{itemize}
-\item Less accuracy
-\item Requires user participation for analysis
-\end{itemize}
-\end{itemize}
+\begin{frame}{\hspace{0.02\paperwidth}Tool Workflow Design}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{images/design.png}
+\end{center}
 \end{frame}
 
 \begin{frame}{\hspace{0.02\paperwidth}Analysis}
@@ -271,111 +232,24 @@ Aaron Welch, Oscar Hernandez,\\Thaleia Dimitra Doudali, Ada Gavrilovska,\\Barbar
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - Imitating CoMerge}
-\begin{itemize}
-\item To mimic the results of our past manual analysis, for each sample we look at the deepest part of the stack, within the kernels, and count the number of samples for each file and line combination
-\item We join this data to the static information from the compiler to find all statements existing on those lines
-\item We further determine all read/write references to symbols within those code lines
-\item We count the total number of references across the samples to each unique symbol
-\item Finally, we find the symbol with the largest reference count and divide all symbol counts by that value to approximate the relative "benefit"
-\end{itemize}
-\end{frame}
-
-\begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - Imitating CoMerge}
-\begin{itemize}
-\item Tests were run on five of the benchmarks from PolyBench - adi, doitgen, fdtd-2d, jacobi-2d-imper, and trmm
-\item PolyBench is a collection of benchmarks with static control flow, extracted from operations in various domains including linear algebra, image processing, and physics simulations
-%TODO taking this stuff out? well crap, I can't as it's too computationally expensive to recompute at this point with my prior methods
-\item All tests were run with a single processor and thread
-\item Timing results from our manual analysis were adjusted such that they were also relative to that of the test run with the slowest performance
-\end{itemize}
-\end{frame}
-
-\begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - Imitating CoMerge}
-\begin{itemize}
-\item Possible to enhance analysis by using polyhedral analysis, assign ``weight'' based on access order with respect to array indices
-\item For out of order access, assign 2x weight penalty
-\item For accesses where innermost loop accesses a constant value, reduce weight by 75\%
-\end{itemize}
-\end{frame}
-
-\begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - Imitating CoMerge}
-\begin{table}[hbt!]
+\begin{frame}{\hspace{0.02\paperwidth}GCC Schema}
 \begin{center}
-\begin{subtable}{.45\linewidth}
-\begin{tabular}{|c|c|c|}
-\hline
-Symbol & Actual & Predicted \\
-\hline\hline
-X & 1 & 0.91 \\
-\hline
-B & 0.85 & 1 \\
-\hline
-A & 0.55 & 0.77 \\
-\hline
-\end{tabular}
-\caption{adi}
-\end{subtable}
-\begin{subtable}{.45\linewidth}
-\begin{tabular}{|c|c|c|}
-\hline
-Symbol & Actual & Predicted \\
-\hline\hline
-cFour & 1 & 1 \\
-\hline
-sumA & 0.78 & 0.75 \\
-\hline
-a & 0.19 & 0.50 \\
-\hline
-\end{tabular}
-\caption{doitgen}
-\end{subtable}
-\begin{subtable}{.45\linewidth}
-\begin{tabular}{|c|c|c|}
-\hline
-Symbol & Actual & Predicted \\
-\hline\hline
-hz & 1 & 1 \\
-\hline
-ey & 0.77 & 0.72 \\
-\hline
-ex & 0.60 & 0.71 \\
-\hline
-\end{tabular}
-\caption{fdtd-2d}
-\end{subtable}
-\begin{subtable}{.45\linewidth}
-\begin{tabular}{|c|c|c|}
-\hline
-Symbol & Actual & Predicted \\
-\hline\hline
-a & 1 & 1 \\
-\hline
-b & 0.95 & 0.27 \\
-\hline
-\end{tabular}
-\caption{jacobi-2d-imper}
-\end{subtable}
-\begin{subtable}{.45\linewidth}
-\begin{tabular}{|c|c|c|}
-\hline
-Symbol & Actual & Predicted \\
-\hline\hline
-b & 1 & 1 \\
-\hline
-a & 0.04 & 0.40 \\
-\hline
-\end{tabular}
-\caption{trmm}
-\end{subtable}
-%\caption{Memory Hotspot Predictions}
-\label{tbl:results}
+\includegraphics[width=0.7\textwidth]{images/gcc-schema.png}
 \end{center}
-\end{table}
+\begin{itemize}
+\item The tool captures and stores all the intermediate representations created at compile time for the application for all compilation units
+\item Converts pointers to table keys per compilation instance
+\item Based on \acs{GCC} \acs{IR}
+\end{itemize}
 \end{frame}
 
 \begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - CP2K}
 \begin{itemize}
+\item Working with Ada Sedova from SciComp for use-cases to drive the tool's requirements
+\begin{itemize}
+\item Understanding library usage
+\item Understanding data structure usage
+\end{itemize}
 \item CP2K is a quantum chemistry and solid state physics software package that can perform atomistic simulations of solid state, liquid, molecular, periodic, material, crystal, and biological systems
 \item Written in Fortran 2003 and supports OpenMP, \acs{MPI}, and CUDA
 %\item Contains roughly 600,000 statements, 2.4 million expressions, and 740,000 symbols
@@ -385,7 +259,15 @@ a & 0.04 & 0.40 \\
 
 \begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - CP2K DFT}
 \begin{itemize}
-\item We start by using the same process used in our PolyBench analysis to tally all occurrences of each symbol
+\item For each sample we look at the deepest part of the stack, within the kernels, and count the number of samples for each file and line combination
+\item We join this data to the static information from the compiler to find all statements existing on those lines
+\item We further determine all read/write references to symbols within those code lines
+\item We count the total number of references across the samples to each unique symbol
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\hspace{0.02\paperwidth}Performing the Analysis - CP2K DFT}
+\begin{itemize}
 \item We filter based upon symbols being referenced within a few of the top functions of interest that we want to analyse
 \item We further select based upon which symbols seen are within openmp parallel and parallel do sections
 \item In an idealised situation, the reference count for each symbol in a parallel section should remain roughly the same for any number of threads (with the counts simply distributed across threads)
@@ -422,6 +304,23 @@ a & 0.04 & 0.40 \\
 \item Expand analysis to include multiple \acs{MPI} processes
 \item Look into various forms of inter-procedural analysis that were previously impossible to consider
 \item Apply information obtained to determining memory placement in large applications using complex memory hierarchies to discover and improve predictive capacity and verify results at scale
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\hspace{0.02\paperwidth}PhD Timeline}
+\begin{itemize}
+\item Predefence late september/early october
+\item Develop tools that recommend memory placement into hierarchical memory work in tandem with preparing for predefence
+\begin{itemize}
+\item No specific target venue yet, but would like to be done with the work itself at least by no later than around the supercomputing time frame
+\end{itemize}
+\item Implement allocators to manage data in different memory subsystems within and across nodes (\acs{PGAS})
+\item Work on core thesis topic with focus on filling holes in thesis
+\begin{itemize}
+\item Produce another publishable work on said topic for the spring semester
+\end{itemize}
+\item ...
+\item Defend thesis
 \end{itemize}
 \end{frame}
 
