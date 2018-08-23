@@ -1,8 +1,7 @@
-Emerging HPC platforms are becoming extraordinarily difficult to program as a result of complex, deep  and heterogeneous memory hierarchies, heterogenous cores, and the need to divide work and data among them.
+Emerging HPC platforms are becoming extraordinarily difficult to program as a result of complex, deep  and heterogeneous memory hierarchies, heterogeneous cores, and the need to divide work and data among them.
 New programming models and libraries are being developed to aid in porting efforts of application developers, but substantial code restructuring is still necessary to fully make use of these new technologies.
 To do this effectively, these developers need information about their source code characteristics, together with dynamic (including performance) information to direct their efforts and make key decisions.
 On the other side, system administrators need to understand how users are using system software and resources to exploit modern architectures and how their investment improves the productivity of the users on a platform.
 
 In this paper we describe a system that we are constructing in order to provide such information at the level of an application or across multiple applications.
-Static and dynamic data about applications are collected and stored together in an \acs{SQL} database so that they can be queried by either a developer or a system administrator.
-We will demonstrate use of this tool via an application-driven use-case study.
+Static and dynamic data about applications are collected and stored together in an \acs{SQL} database that can be queried by either a developer or a system administrator. In this paper, we will demonstrate the capabilities of this tool via real-world application-driven use-cases to port the application CP2K to multiple platforms.
