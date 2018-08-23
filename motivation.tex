@@ -1,0 +1,17 @@
+% 2 pages
+According to the center of accelerated application readiness at ORNL, 80\% of application porting effort to Titan (a GPU-based system) was spent understanding and restructuring the code and 20\% adding a new on-node parallel programming model (e.g. CUDA, OpenMP/OpenACC, etc). 
+For example, a CP2K application developer knows that scalapack, a linear algebra library, is linked in his code but doesn't understand how it is being used in its code and how it is affecting the performance of the code on a given system. Ideally, she is interested to know how Scalapack is affecting the performance of a particular solver or calculation and how the parallel communication is affecting the performance on a given system.  
+
+She noticed that on a particular system Eos (a Xeon Phi based system) her code outperforms a GPU-based system Titan but doesn't know if its related to the implementation of the library, or how it is used in the code. Ideally, what she want is to swap-in/out libraries implementations across systems to port her codes to multiple platforms. She wants to understand why this is not an easy task as she is observing a lot of  performance difference. She thinks it may be related to the way the library is being invoked in the multi-threaded region of the code or it may be related on the quality of implementation of the library on a given system that favors one architecture over the other. 
+
+ Furthermore, she wants to communicate her scientific library requirements to the system to the system administrator to make sure future systems have the proper library support for her code. 
+ 
+
+
+One last thing that I wouldn't mind knowing about, if it's possible, is how the code handles openMP vs. MPI use. My benchmarks of this calculation on Eos and Titan showed that using many MPI ranks per node, even 32 on Eos, gave better performance than any use of openMP at all! I thought this was interesting. It's possible that the MPI implementation is really well done and the openMP is not. Or, it could just be something about the calculation itself. I think this is actually a very interesting CS problem.
+
+Thanks!
+
+-A
+
+%Describe the challenges posed by new platforms in more detail, describe what programming models and libraries are doing to address this - which includes stating that the user will need to remain involved, think of OpenMP memory features - and then what existing tools offer
