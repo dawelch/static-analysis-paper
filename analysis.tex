@@ -47,8 +47,8 @@ Furthermore, this also allows us to dump all data in the most straightforward of
 
 This part of the data can be obtained automatically and without the direct involvement of the user, using the same methods used by XALT \cite{7081224}.
 That is, a wrapper can be made for \ac{GCC} to intercept compilation and make it use the necessary plugin, and dump the data either to files, a system log, or directly to the database.
-In addition to the primary data about the code itself, XALT is able to insert a unique identifier into each linked application such that when they are run, it can be tied back to each of the particular compilations and associated data, which we also need here for connecting the dynamic data at a later stage.
-%TODO: clarify the difference between build ids and linked/application ids?
+In addition to the primary data about the code itself, XALT is able to insert a unique identifier into each linked application.
+An additional relation between this link ID and the compilation unit build IDs used for each of the files being linked must be made so that when applications are run, they can be tied back to each of the particular compilations and associated data, which we also need here for connecting the dynamic data at a later stage.
 \subsubsection{Querying the Database}
 Due to the way we identify records and store object references, we are able to use any columns representing pointers as foreign keys with which to join connected tables in the database.
 One of the most important things we need the database to do for us is associate each code line with file lines.
@@ -72,7 +72,7 @@ With these classifications, we can then weigh each access observed for a sample 
 \subsection{Dynamic Analysis}
 %TODO: cite map?
 For the dynamic analysis, we used the ARM MAP sampling based profiler.
-First, in order to link the static and dynamic data later, it needs to record the application's ID that was linked in during compilation.
+First, in order to link the static and dynamic data later, it needs to record the application's link ID that was added in during compilation.
 Then, given a sample frequency and number of samples, it periodically probes the application for a set of predetermined metrics, then gathers the samples together to dump them out to an \acs{XML} file.
 What we are interested in here is simply where each thread is at in the code at the time of sampling, specifically the file and line number for each frame of the stack.
 We process the \acs{XML} file to extract this information via \ac{XSLT} to produce a \acs{CSV} file with the fields we want, and then upload it to the database so that we can achieve a count of how many times any given line is observed being executed by a thread.
@@ -81,7 +81,7 @@ We use this simple metric to determine in what regions of code the application i
 While the static information is dumped once, the dynamic information can be obtained any desired number of times.
 This allows for variable parametres to be used to see their influence on the code, such as the number of threads/processes or the problem size.
 Which profile(s) to use for each analysis report must be specified directly by the user upon requesting the report.
-Then, the tool can construct a query that links the compile-time and run-time data based upon the application's linked ID and MAP run ID(s) to provide the desired results.
+Then, the tool can construct a query that links the compile-time and run-time data based upon the application's link ID and MAP run ID(s) to provide the desired results.
 %\subsection{Combined Analysis}
 %The real value of the analysis comes when combining the previously described static and dynamic aspects into a more comprehensive evaluation of the code.
 %Using the results from MAP, we focus only on the subset of lines we recorded samples from, and use the information from the static analysis to obtain the symbols and their reference totals across those lines.
