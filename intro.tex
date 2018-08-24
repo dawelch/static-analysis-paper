@@ -1,7 +1,17 @@
-% 1.5 pages 
-Emerging HPC platforms are becoming extraordinarily difficult to target as a result of complex, deep  and heterogeneous memory hierarchy, heterogeneous cores and need to divide work among them. Cost in terms of both power and performance of moving data across system.
-Programming models and libraries being developed or enhance to relieve work of app developer but will not be sufficient. In many cases, the developer will need to modify code 
-Needs information (and the right kind) to make key decisions.
-In this paper we describe a system that we are constructing in order to provide such information. Static and dynamically collected facts about a program that are stored and can be queried. Potentially usable by either a developer or a tool. This system is under construction yet several parts are already functional. 
-Show an early evaluation via a case study.
-\cite{polybench}
+Emerging HPC platforms are becoming extraordinarily difficult to program as a result of complex, deep and heterogeneous memory hierarchies, heterogeneous cores, and the need to divide work and data among them.
+New programming models and libraries are being developed to aid in porting efforts of application developers, but substantial code restructuring is still necessary to fully make use of these new technologies.
+To do this effectively, these developers need information about their source code characteristics, together with dynamic (including performance) information to direct their efforts and make key decisions.
+Furthermore, considering the potentially costly process of porting applications we need to explore partially or fully automated approaches to optimise existing codes written using de facto programming models.
+On the other side, system administrators also need to understand how users are using system software and resources to exploit modern architectures and how their investment improves the productivity of the users on a platform.
+
+In this paper we describe a system that we are constructing in order to provide such information at the level of an application or across multiple applications.
+Instead of focusing on extending programming models to abstract the complexity of these new architectures, we focus on minimally intrusive, low overhead methods implemented via tools for identifying key characteristics and regions of code so that developers may make better decisions regarding what parts of the application to focus their efforts on.
+Static and dynamic data about applications are collected and stored together in an \acs{SQL} database that can be queried by either a developer or a system administrator.
+This allows us to perform analysis of code by combining information exported from the compiler with supplementary information obtained from a performance sampling tool to better and more finely investigate and reason about code bases of any size in a standard way.
+This work is currently focused on the analysis of Fortran code for simplicity, though it can be applied in much the same way to C/C++.
+We will demonstrate the capabilities of this tool via a real-world application-driven case study on the molecular dynamics application CP2K.
+
+We based our work off of what was being done with XALT \cite{7081224}, with the key differences being the expansion of the level of data being dumped, the ability to integrate the information with profiler output, and a focus on allowing the resulting information to be easily queried by all interested parties.
+%TODO forgot where I was going with this; come back and finish the rest of what needs to/should go here
+
+The rest of this paper is organised as follows: Section~\ref{sec:motivation} describes the motivation behind the development of this tool, Section~\ref{sec:related} highlights related work, Section~\ref{sec:analysis} describes in detail the tool and how it works, Section~\ref{sec:casestudy} demonstrates via a case study some of the things our tool can report about code, and Section~\ref{sec:conclusion} provides our conclusions about our work and outlines some next steps for improving it further.
