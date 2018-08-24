@@ -11,7 +11,7 @@ The optional dynamic analysis is run separately by the user to collect periodic 
 These two sources of information are inserted into tables in an \acs{SQL} database, which then allows for queries to be run using one or both sources of data to gain insight into the code's execution.
 An illustration of the this flow can be seen in Figure~\ref{fig:design}.
 These steps will be addressed separately in the following subsections.
-While we include components of a dynamic analysis in this way, we primarily emphasise the use of static information, with the dynamic analysis mostly used to narrow the focus more specifically on regions of particular interest and supplement the functional data obtained from the compiler with additional non-functional data (e.g. hardware counter information).
+While we include components of a dynamic analysis in this way, we primarily emphasise the use of static information, with the dynamic analysis mostly used to narrow the focus more specifically on regions of particular interest and supplement the functional data (e.g.  of routines invocations, loop trip counts, etc) with additional non-functional data (e.g. hardware counter information) obtained from both the compiler and performance tool. 
 
 \begin{figure}
 \begin{center}
@@ -60,8 +60,9 @@ Some of our focus on the static analysis and all of the focus on the dynamic ana
 %In this way, we are then able construct queries to tally the total number of references for every symbol referenced across any subset of lines.
 
 %TODO: more poly?
-In order to enhance the predictive capacity of our analysis, we look to polyhedral analysis by utilising \acsp{GCC} Graphite framework\cite{trifunovic:inria-00551516}.
-At this time, our use of the polytopes provided by Graphite is simply to do some basic reasoning about memory access order for arrays - notably, to find cases where a particular access is likely to result in either a greater or lesser number of cache misses than a typical in order access pattern.
+In addition, we added to the database
+polyhedral analysis information by utilising \acsp{GCC} Graphite framework\cite{trifunovic:inria-00551516}.
+At this time, our use of the polytopes provided by Graphite is to do some basic reasoning about memory access order for arrays - notably, to find cases where a particular access is likely to result in either a greater or lesser number of cache misses than a typical in order access pattern.
 
 We classify accesses into three categories based on a focus on the relation to the domain of the innermost loop.
 For loops with iterators \texttt{i}, \texttt{j}, \texttt{k}, in that order, we refer to these categories as follows: the \texttt{[k][j]} class, the \texttt{[j][k]} class, and the \texttt{[j][i]} class.

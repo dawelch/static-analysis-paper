@@ -1,13 +1,12 @@
 According to the center of accelerated application readiness at ORNL, 80\% of application porting efforts to Titan (a \acs{GPU}-based system) was spent understanding and restructuring the code and 20\% on adding a new on-node parallel programming model (e.g. CUDA, OpenMP/OpenACC, etc).
 Worse yet is that much of this effort often does not translate well from one application to another, making it a tedious and costly affair.
 We expect this aspect of porting to be equally if not even more burdensome for other and future systems.
-Ideally, what we want is to be able to swap library implementations in and out across systems in order to port code to multiple platforms more efficiently.
-This would allow us to relieve some of the strain placed on application developers in porting their code to future system architectures.
+Ideally, what a user wants is to be able to use a portable programming model that will allow it build the source code as it is, swap library implementations in and out across systems, and run the code with different runtime parameters (e.g. \# of threads, MPI ranks, etc) in order to port code to multiple platforms more efficiently. This would allow us to relieve some of the strain placed on application developers in porting their code to future system architectures.
 It also helps in avoiding the need to maintain multiple versions or code paths to support all target architectures, which is another problem that still plagues many applications.
 
 Another issue many applications face is that even after initial porting efforts to use new software and hardware technologies, they may have difficulty with scaling to exploit the full extent of the system and may not use the resources efficiently and obtain the expected performance characteristics.
-It is rarely easy to discover and understand why this is the case, due both to code complexity as well as scale.
-As such, being able to quickly and easily investigate large code bases as well as identify and test for common issues and patterns is key to application developers being able to port more effectively.
+It is rarely easy to discover and understand the sources of inefficiencies due both to code and target architecture complexity as well as the scale.
+As such, being able to quickly and easily investigate large code bases as well as identify efficient / inefficient code patterns is key to application developers being able to port more effectively.
 
 %TODO: what are other models/libraries/tools doing to address this?
 

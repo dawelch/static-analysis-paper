@@ -27,7 +27,7 @@ Various tools have been developed to capture program information, but they are n
 \item Require significant user intervention (e.g. code restructuring, working with tools experts)
 \item They are not available on all platforms
 \end{itemize}
-Also, most of these tools are not able to combine both static and dynamic program information at the level of detail of our tool.
+Also, most of these tools are not able to combine both static and dynamic program information at the level of detail to understand how performance portable is the structure of a code.
 OpenAnalysis~\cite{Strout:2005}, Program Database Toolkit~\cite{Lindlan2000}, ROSE~\cite{Willcock:2009:RGP:1621607.1621611}, Hercules~\cite{kartsaklis2012hercules}, TSF~\cite{bodin1998user}, RTalk~\cite{SPE:SPE1035}, and CHiLL/Harmony~\cite{tiwari2009scalable} rely on compiler technology to gather program information and most of them are used for code transformations done by tools.
 HPCToolkit's~\cite{Adhianto2010} hpcstruct component gathers some program traits from the binaries of applications by trying to reconstruct specific constructs like loop nests, however it requires reconstructing the programs after optimisations are performed which may not match the original source code or cannot detect the higher level features of languages due to information loss during lowering.
 The Collective Tuning project~\cite{Fursin:2016} aims to create a database of program structure features and find compiler optimisations for performance, power, and code size.
