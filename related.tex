@@ -1,13 +1,13 @@
 % 1/2 page - Oscar
 Research on static analysis of code has a long history, and has both taken many forms and addressed numerous problem domains\cite{Andrade:2012:SAW:2355585.2355593}\cite{1194988}.
-%avoid hyperbole
+%AS: avoid hyperbole
 Our focus on utilizing the compiler for our static analysis means that we can benefit from the dearth of both static analysis as well as compiler research.
 Compilers face many difficult challenges in transforming code while ensuring that the meaning of the code has not been changed.
 What this means for us is that some of the same methods used to validate transformations can be applied to analyzing code, such as for array accesses within loops.
 %A key concept to that end is that of dependences between statements, such that the order of statements required to preserve this meaning must remain the same.
 More generally, a key challenge is to determine how variables are used and data travels through them in some form of dataflow analysis\cite{Feautrier1991}.
-This is also commonly used to discover more complicated patterns of memory access, for enabling optimisations such as loop tiling to make better use of cache performance.
-
+This is also commonly used to discover more complicated patterns of memory access, for enabling optimizations such as loop tiling to make better use of cache performance.
+%AS: need some small intro to dynamic analysis here, there is none. Why dynamic, what good for, what extra info it provides, etc. 1-2 sentences.
 Among the more advanced methods compilers use to analyze code is to employ the polyhedral model\cite{Cousot:1978:ADL:512760.512770}\cite{Bagnara:2009:APC:1628316.1628385}\cite{benabderrahmane.10.cc}.
 %you are not British, quit using the British versions of words, lol.
 The polyhedral method is ideally suited for representing and reasoning about loops, although is generally restricted to operating on affine loop nests.
