@@ -8,7 +8,7 @@ What this means for us is that some of the same methods used to validate transfo
 More generally, a key challenge is to determine how variables are used and data travels through them in some form of dataflow analysis\cite{Feautrier1991}.
 This is also commonly used to discover more complicated patterns of memory access, for enabling optimisations such as loop tiling to make better use of cache performance.
 
-Among the more advanced methods compilers use to analyse code is to employ the polyhedral model\cite{Cousot:1978:ADL:512760.512770}\cite{Bagnara:2009:APC:1628316.1628385}\cite{benabderrahmane.10.cc}.
+Among the more advanced methods compilers use to analyze code is to employ the polyhedral model\cite{Cousot:1978:ADL:512760.512770}\cite{Bagnara:2009:APC:1628316.1628385}\cite{benabderrahmane.10.cc}.
 %you are not British, quit using the British versions of words, lol.
 The polyhedral method is ideally suited for representing and reasoning about loops, although is generally restricted to operating on affine loop nests.
 A primary benefit of using polytopes over other methods is their natural ability to compactly and mathematically represent access patterns within loops regardless of the bounds of their domains.
