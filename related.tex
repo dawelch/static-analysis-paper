@@ -1,21 +1,21 @@
 % 1/2 page - Oscar
 Research on static analysis of code has a long history, and has both taken many forms and addressed numerous problem domains\cite{Andrade:2012:SAW:2355585.2355593}\cite{1194988}.
-%avoid hyperbole
+%AS: avoid hyperbole, or even editorializing (very very extremely long history)
 Our focus on utilising the compiler for our static analysis means that we can benefit from the dearth of both static analysis as well as compiler research.
 Compilers face many difficult challenges in transforming code while ensuring that the meaning of the code has not been changed.
 What this means for us is that some of the same methods used to validate transformations can be applied to analysing code, such as for array accesses within loops.
 %A key concept to that end is that of dependences between statements, such that the order of statements required to preserve this meaning must remain the same.
 More generally, a key challenge is to determine how variables are used and data travels through them in some form of dataflow analysis\cite{Feautrier1991}.
 This is also commonly used to discover more complicated patterns of memory access, for enabling optimisations such as loop tiling to make better use of cache performance.
-
+%AS: need some small intro to dynamic analysis here, there is none. Why dynamic, what good for, what extra info it provides, etc. 1-2 sentences.
 Among the more advanced methods compilers use to analyse code is to employ the polyhedral model\cite{Cousot:1978:ADL:512760.512770}\cite{Bagnara:2009:APC:1628316.1628385}\cite{benabderrahmane.10.cc}.
 %you are not British, quit using the British versions of words, lol.
 The polyhedral method is ideally suited for representing and reasoning about loops, although is generally restricted to operating on affine loop nests.
 A primary benefit of using polytopes over other methods is their natural ability to compactly and mathematically represent access patterns within loops regardless of the bounds of their domains.
 The model constructs polytopes for the $n$-dimensional space reflected by the loop nest's domain where iterations are represented as lattice points.
 As a polytope is composed of the solutions to a finite number of linear inequalities, much of the analysis becomes a series of math problems on matrices.
-While the model is highly expressive and powerful, its applicability constraints and relative computational expense for some operations on it have traditionally limited its practical use in compilation\cite{DBLP:journals/entcs/Simon10a}.
-Nonetheless, a lot of work has been done on it for more precisely determining dependences\cite{Vasilache:2006:VDA:1183401.1183448} as well as for more advanced optimisation techniques\cite{Nieuwenhuizen2014AutovectorizationUP}\cite{5260526}.
+While the model is highly expressive and powerful, its applicability constraints and relative computational expense for some operations on it have traditionally limited its practical use in compilation \cite{DBLP:journals/entcs/Simon10a}.
+Nonetheless, a lot of work has been done on it for more precisely determining dependences \cite{Vasilache:2006:VDA:1183401.1183448} as well as for more advanced optimization techniques\cite{Nieuwenhuizen2014AutovectorizationUP}\cite{5260526}.
 While not heavily employed, progress into polyhedral analysis has made its way into both the \ac{GCC}\cite{trifunovic:inria-00551516} and LLVM\cite{grosser.11.impact} compilers.
 Here, the focus is on a subset of loop nests referred to as \acp{SCoP}\cite{TBas}, which are defined in \cite{benabderrahmane.10.cc} as the maximal set of consecutive statements where loop bounds and conditionals are affine functions of the surrounding loop iterators and parametres.
 %TODO: reference openscop? openscop\cite{Bas11}
@@ -41,5 +41,5 @@ Unfortunately, they have only limited Fortran90 support, and the output hides im
 Pliny~\cite{Feser:2015} is a project that focuses on detecting and fixing errors in programs, as well as synthesising reliable code from high level specifications.
 It relies on mining information and statistics and is both still in the early research stage and not meant for increasing program understanding.
 It also currently doesn't support Fortran.
-%Here you sound like you really want to support FORTRAN and that is an important part of your effort, but in the intro, you only say that you used FORTRAN because it was easier. If you want to cash in on this FORTRAN support thing, you need to change the intro part to says something like: "not many of these types of tools support FORTRAN, and here we propose one that does, and also, FORTRAN compiler output happens to be easier to deal with."
+%AS: Here you sound like you really want to support FORTRAN and that is an important part of your effort, but in the intro, you only say that you used FORTRAN because it was easier. If you want to cash in on this FORTRAN support thing, you need to change the intro part to says something like: "not many of these types of tools support FORTRAN, and here we propose one that does, and also, FORTRAN compiler output happens to be easier to deal with."
 Finally, tools such as XALT/ALTD~\cite{xalt,xalt2}, PerfTrack~\cite{Karavanic:2005:IDT:1105760.1105804}, Oxbow/PADS~\cite{oxbowpads}, IPM~\cite{5695625}, and HPC system scheduling information provide system environment, linkage information (e.g. for library detection), and runtime and performance information that is complementary to application source code features.
