@@ -43,6 +43,8 @@ For the database, we used PostgreSQL for some of its advanced query support.
 We did not attempt to create our own schema to represent the code, as it would not immediately be necessary due to the tables not being intended as a user-facing interface and our current focus on Fortran not requiring a new language agnostic schema.
 %TODO: no possessive acronyms... :'(
 Instead, we simply dumped out \ac{GCC}'s internal data structures such that each data structure was a table, and each member of the data structure was a column.
+We currently extract information from 160 \acs{GCC} data structures (tables) consisting of 1014 fields (columns).
+Eventually, once enough queries have been made for users, it may then be possible to reduce the level of information down if there is a great enough difference between what is captured and what is actually used, but that is left for future work.
 %TODO: technically not all tables...mention enums?
 Common to all tables are two columns for the pointer to the data structure in memory during compilation, and a build ID unique to each compilation unit.
 %TODO: necessary to very briefly explain primary/foreign keys, etc, or are they sufficiently self-describing?
@@ -57,9 +59,21 @@ An additional relation between this link ID and the compilation unit build IDs u
 Due to the way we identify records and store object references, we are able to use any columns representing pointers as foreign keys with which to join connected tables in the database.
 One of the most important things we need the database to do for us is associate each code line with file lines.
 A lot of our focus on the analysis is dependent on lines of code, so our queries were constructed so as to be able to clearly relate what file and line numbers are involved in an operation.
-%TODO: explain what we do here better or not?
-%In particular, we go through each statement and look up which file and lines they span using the line map table, traverse the expression trees for those statements, filter for expressions containing references to the symbol table, then finally check the symbol table to determine which particular symbols are being referenced.
-%In this way, we are then able construct queries to tally the total number of references for every symbol referenced across any subset of lines.
+
+%TODO: cite gcc documentation?
+While a full overview of the schema is best left to the compiler's documentation, we will briefly detail a few key structures and fields here to give an idea on what kind of information can be queried.
+First, we start with what is referred to as a namespace, which describes the contents of procedures, modules, interfaces, and block constructs.
+Starting from the root, each namespace contains references to any contained namespaces, a reference to that namespace's symbol tree, and a reference to the first code statement when applicable.
+A code statement is used to represent each individual operation in the code, including assignment, \acs{I/O} operations, conditionals, loops, and function calls.
+Each statement contains fields for the operation type, the location it exists in the code, its symbol tree, its contained expressions, references to the next statement (if there is one) and the first statement in the contained block of code it starts (e.g. as in the case of loops), and any supplementary information specific to particular operation types such as iterators, or in the case of OpenMP statements, a reference to another table containing information on the clauses.
+Expressions are actually represented as expression trees, where each node contains the type of expression (e.g. constants, variables, arithmetic expressions), its location in the code, its symbol tree, and references to its child expressions (if it isn't a leaf node).
+Finally, each symbol in a symbol tree contains the symbol's name, type, module/scope, its declaration location, and attributes.
+
+We are able to use the data in these tables to perform the reference counting needed in section~\ref{sec:casestudy}.
+In particular, we go through each statement for each namespace and look up on which files and lines they occur, traverse the expression trees for those statements, filter for expressions containing references to variables, then finally check the symbol table to determine which particular variables are being referenced.
+We can optionally enhance this further, such as by selecting only variables within particular functions of interest, variables of a particular type, variables being assigned to, and/or variables within OpenMP regions.
+Finally, we can combine the results with that of the dynamic analysis detailed in section~\ref{sec:dynamic} so as to know how many times each line was seen in actual execution.
+In this way, we are then able construct queries to tally the total number of references observed for every variable across any subset of lines.
 
 %TODO: more poly?
 In addition, we added to the database
@@ -75,6 +89,7 @@ Finally, the final \texttt{[j][i]} class is intended to represent the cases wher
 %TODO: reference this cost model paper in some way?
 With these classifications, we can then weigh each access observed for a sample more or less based on the access type to create a cost model for our analysis.%\cite{5608348}
 \subsection{Dynamic Analysis}
+\label{sec:dynamic}
 %TODO: cite map?
 For the dynamic analysis, we used the ARM MAP sampling based profiler.
 First, in order to link the static and dynamic data later, it needs to record the application's link ID that was added in during compilation.
