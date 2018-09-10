@@ -13,7 +13,7 @@ The optional dynamic analysis is run separately by the user to collect periodic 
 These two sources of information are inserted into tables in an \acs{SQL} database, which then allows for queries to be run using one or both sources of data to gain insight into the code's execution.
 An illustration of the this flow can be seen in Figure~\ref{fig:design}.
 These steps will be addressed separately in the following subsections.
-While we include components of a dynamic analysis in this way, we primarily emphasize the use of static information, with the dynamic analysis mostly used to narrow the focus more specifically on regions of particular interest and supplement the functional data (e.g.  of routines invocations, loop trip counts, etc) with additional non-functional data (e.g. hardware counter information) obtained from both the compiler and performance tool. 
+While we include components of a dynamic analysis in this way, we primarily emphasise the use of static information, with the dynamic analysis mostly used to narrow the focus more specifically on regions of particular interest and supplement the functional data (e.g. of routines invocations, loop trip counts, etc) obtained from the compiler with additional non-functional data (e.g. hardware counter information) obtained from the performance tool.
 
 \begin{figure}
 \begin{center}
@@ -40,7 +40,7 @@ Using its plugin \acs{API}, we created a module to be loaded and run after the c
 The plugin runs through all the relevant data structures in the \ac{AST} representing the code to queue the data, then proceeds to dump them all at once in bulk transactions.
 For the database, we used PostgreSQL for some of its advanced query support.
 \subsubsection{Dumping the Data}
-We did not attempt to create our own schema to represent the code, as it would not be necessary due to the tables not being intended as a user-facing interface.
+We did not attempt to create our own schema to represent the code, as it would not immediately be necessary due to the tables not being intended as a user-facing interface and our current focus on Fortran not requiring a new language agnostic schema.
 %TODO: no possessive acronyms... :'(
 Instead, we simply dumped out \ac{GCC}'s internal data structures such that each data structure was a table, and each member of the data structure was a column.
 %TODO: technically not all tables...mention enums?
@@ -56,7 +56,7 @@ An additional relation between this link ID and the compilation unit build IDs u
 \subsubsection{Querying the Database}
 Due to the way we identify records and store object references, we are able to use any columns representing pointers as foreign keys with which to join connected tables in the database.
 One of the most important things we need the database to do for us is associate each code line with file lines.
-Some of our focus on the static analysis and all of the focus on the dynamic analysis is dependent on line numbers, so our queries were constructed so as to be able to clearly relate what file and line numbers are involved in an operation.
+A lot of our focus on the analysis is dependent on lines of code, so our queries were constructed so as to be able to clearly relate what file and line numbers are involved in an operation.
 %TODO: explain what we do here better or not?
 %In particular, we go through each statement and look up which file and lines they span using the line map table, traverse the expression trees for those statements, filter for expressions containing references to the symbol table, then finally check the symbol table to determine which particular symbols are being referenced.
 %In this way, we are then able construct queries to tally the total number of references for every symbol referenced across any subset of lines.
