@@ -9,7 +9,7 @@ Instead of focusing on extending programming models to abstract the complexity o
 Static and dynamic data about applications are collected and stored together in an \acs{SQL} database that can be queried by either a developer or a system administrator.
 This allows us to perform analysis of code by combining information exported from the compiler with supplementary information obtained from a performance sampling tool to better and more finely investigate  and reason about code bases of any size in a standard way.
 This work is currently focused on the analysis of Fortran code for simplicity, though it can be applied in much the same way to C/C++.
-We will demonstrate the capabilities of this tool via a real-world application-driven case study on the molecular dynamics application CP2K.
+We will demonstrate the capabilities of this tool via a real-world application-driven case study on the linear-scaling self-consistent field calculation application CP2K.
 
 We based our work off of what was being done with XALT \cite{7081224}, with the key differences being the expansion of the level of detail the data being exported, the ability to integrate the static and dynamic information (e.g. profiler output), and a focus on allowing the resulting information to be easily queried by a user or system administrator.
 %TODO forgot where I was going with this; come back and finish the rest of what needs to/should go here
