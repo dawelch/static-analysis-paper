@@ -6,9 +6,8 @@
 %\subsection{Database Schema}
 For the automated analysis, rather than exclusively developing our own tools, we relied as much as possible on existing production quality tools and environments.
 %TODO -- you need to explain what information are you extracting from the compiler --- you need to mention that you are extracting the Abstract Syntax Tree, and what other analysis and that you are leverging from gfortran intermediate representation data structures, where you are making a bridge from the intermediate program representation to SQL.
-Our method extracts data about code directly from a production compiler \ac{GCC}, initially with an exclusive focus on Fortran, and optionally uses a scalable performance analysis tool (Allinea MAP)
 %AS: cite Allinea MAP
-to obtain information on run-time characteristics.
+Our method extracts data about code directly from a production compiler \ac{GCC}, initially with an exclusive focus on Fortran, and optionally uses a scalable performance analysis tool (Allinea MAP) to obtain information on run-time characteristics.
 The optional dynamic analysis is run separately by the user to collect periodic samples of where the application is spending time.
 These two sources of information are inserted into tables in an \acs{SQL} database, which then allows for queries to be run using one or both sources of data to gain insight into the code's execution.
 An illustration of the this flow can be seen in Figure~\ref{fig:design}.
