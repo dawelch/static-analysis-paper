@@ -2,12 +2,14 @@
 Research on static analysis of code has a very long history and has both taken many forms and addressed innumerable problem domains\cite{Andrade:2012:SAW:2355585.2355593}\cite{1194988}.
 Our focus on utilising the compiler for our static analysis means that we can benefit from the dearth of both static analysis as well as compiler research.
 Compilers face many difficult challenges in transforming code while ensuring that the meaning of the code has not been changed.
-What this means for us is that some of the same methods used to validate transformations can be applied to analysing code, such as for array accesses within loops.
+What this means for us is that some of the same methods used to validate transformations can be applied to analyzing code, such as for array accesses within loops.
 %A key concept to that end is that of dependences between statements, such that the order of statements required to preserve this meaning must remain the same.
 More generally, a key challenge is to determine how variables are used and data travels through them in some form of dataflow analysis\cite{Feautrier1991}.
 This is also commonly used to discover more complicated patterns of memory access, for enabling optimisations such as loop tiling to make better use of cache performance.
 
-Among the more advanced methods compilers use to analyse code is to employ the polyhedral model\cite{Cousot:1978:ADL:512760.512770}\cite{Bagnara:2009:APC:1628316.1628385}\cite{benabderrahmane.10.cc}.
+Among the more advanced methods compilers use to analyze
+%you are not British, quit using the British versions of words, lol.
+code is to employ the polyhedral model\cite{Cousot:1978:ADL:512760.512770}\cite{Bagnara:2009:APC:1628316.1628385}\cite{benabderrahmane.10.cc}.
 The polyhedral method is ideally suited for representing and reasoning about loops, although is generally restricted to operating on affine loop nests.
 A primary benefit of using polytopes over other methods is their natural ability to compactly and mathematically represent access patterns within loops regardless of the bounds of their domains.
 The model constructs polytopes for the $n$-dimensional space reflected by the loop nest's domain where iterations are represented as lattice points.
@@ -39,4 +41,5 @@ Unfortunately, they have only limited Fortran90 support, and the output hides im
 Pliny~\cite{Feser:2015} is a project that focuses on detecting and fixing errors in programs, as well as synthesising reliable code from high level specifications.
 It relies on mining information and statistics and is both still in the early research stage and not meant for increasing program understanding.
 It also currently doesn't support Fortran.
+%Here you sound like you really want to support FORTRAN and that is an important part of your effort, but in the intro, you only say that you used FORTRAN because it was easier. If you want to cash in on this FORTRAN support thing, you need to change the intro part to says something like: "not many of these types of tools support FORTRAN, and here we propose one that does, and also, FORTRAN compiler output happens to be easier to deal with."
 Finally, tools such as XALT/ALTD~\cite{xalt,xalt2}, PerfTrack~\cite{Karavanic:2005:IDT:1105760.1105804}, Oxbow/PADS~\cite{oxbowpads}, IPM~\cite{5695625}, and HPC system scheduling information provide system environment, linkage information (e.g. for library detection), and runtime and performance information that is complementary to application source code features.
