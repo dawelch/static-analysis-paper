@@ -11,12 +11,12 @@ The polyhedral method is ideally suited for representing and reasoning about loo
 In addition, high relative computational expense has traditionally limited its practical use in compilation \cite{DBLP:journals/entcs/Simon10a}.
 Nonetheless, a lot of work has been done on it for more precisely determining dependences \cite{Vasilache:2006:VDA:1183401.1183448} as well as for more advanced optimisation techniques\cite{Nieuwenhuizen2014AutovectorizationUP}\cite{5260526}.
 
-DYNAMIC ANALYSIS IS IMPORTANT ALSO BECAUSE (2 sentences)
-%TODO: reference openscop? openscop\cite{Bas11}
-%TODO: talk more about gcc internals/analysis?  gdfa citation?
-
-
-Various tools have been developed to capture program information. A majority of these tools are not able to combine both static and dynamic program information at the level of detail of our tool to understand characteristics resulting from the structure of the code. These tools are not commonly used for application data collection on production systems for several reasons:
+As well researched as static analysis methods are, they cannot provide a comprehensive analysis of applications on their own.
+Static analysis is limited to providing functional data about code (e.g. routine invocations, control/data flow, etc), but can't provide non-functional data (e.g. execution time, hardware counters, etc).
+For that, it is necessary to actually observe running code through some form of dynamic analysis.
+Various tools have been developed to capture this program information.
+A majority of these tools are not able to combine both static and dynamic program information at the level of detail of our tool to understand characteristics resulting from the structure of the code.
+These tools are not commonly used for application data collection on production systems for several reasons:
 \begin{itemize}
 \item They are either not fully automated (i.e. transparent to the user)
 \item Have high barriers to entry for users
