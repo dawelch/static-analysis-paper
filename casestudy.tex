@@ -194,7 +194,94 @@ order  by count(ver.version) desc;
 \label{fig:fortran-versions}
 \end{figure}
 
+%TODO: NOTES: missing id hacks, interprocedural analysis discussion, library file/module discussion, ...?
 \subsection{Finding OpenMP Regions Using Key Constructs}
+
+\begin{lstlisting}[caption=foo, label=lst:foo]
+select sym.name,
+       count(sym.name)
+from   gcc.annotated_code as annotated
+       join gcc.gfc_symbol as sym
+         on sym.record_address = annotated.ns_proc_name
+            and sym.build_id = annotated.build_id
+where  annotated."ext.omp_clauses" is not null
+       and annotated.op in ( 75, 76 )
+       and sym.name in (select *
+                        from   subquery)
+group  by sym.name
+having count(sym.name) > 1
+order  by count(sym.name) desc;  
+\end{lstlisting}
+
+\begin{lstlisting}[caption=foo, label=lst:bar]
+select distinct code_lines.ns_proc_name.name
+from	(
+		select stack_files.file,
+		       stack_lines.line
+		from	(
+				select   files,
+				         lines
+				from     map.stack_line_frequency
+				group by files,
+				         lines limit 1) stack
+		join   unnest(stack.files) with ordinality as stack_files(file, index)
+		on     true
+		join   unnest(stack.lines) with ordinality as stack_lines(line, index)
+		on     stack_lines.index = stack_files.index
+		join	(
+				select distinct filename
+				from            gcc.gfc_file) file
+		on     file.filename = stack_files.file) freq
+join	gcc.code_lines as code_lines
+on	code_lines.filename = freq.file
+and	code_lines.lines @> array[freq.line]
+join	gcc.gfc_symbol as sym
+on	sym.record_address = code_lines.ns_proc_name
+and	sym.build_id = code_lines.build_id;
+\end{lstlisting}
+
+\begin{table}[htbp]
+\caption{ScaLAPACK Subroutine Reference Locations}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Subroutine} & \textbf{Parallel Regions} \\
+\hline
+xc\_calc\_2nd\_deriv & 28 \\
+\hline
+xc\_rho\_set\_update & 15 \\
+\hline
+rs\_pw\_transfer\_distributed & 14 \\
+\hline
+pw\_axpy & 14 \\
+\hline
+mp2\_redistribute\_gamma & 12 \\
+\hline
+calculate\_dispersion\_nonloc & 11 \\
+\hline
+xc\_vxc\_pw\_create & 10 \\
+\hline
+rpa\_num\_int & 10 \\
+\hline
+pw\_spline3\_deriv\_g & 9 \\
+\hline
+pw\_spline2\_deriv\_g & 9 \\
+\hline
+pw\_copy & 8 \\
+\hline
+arnoldi & 8 \\
+\hline
+multiply\_3d & 7 \\
+\hline
+pw\_derive & 7 \\
+\hline
+sccs & 6 \\
+\hline
+\end{tabular}
+\label{tab:foo}
+\end{center}
+\end{table}
+
 %\subsection{Finding Unnecessary or Inefficient OpenMP Regions}
 
 \subsection{Measuring Variable Use Within OpenMP Parallel Regions}
@@ -205,6 +292,6 @@ Figure~\ref{fig:openmp-refcount}
 \begin{center}
 \includegraphics[width=0.4\textwidth]{images/cp2k-omp-inc-full.pdf}
 \end{center}
-\caption{Sampled reference counts to variables within OpenMP parallel regions}
+\caption{Sampled Reference Counts to Variables Within OpenMP Parallel Regions}
 \label{fig:openmp-refcount}
 \end{figure}
