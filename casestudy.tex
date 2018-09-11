@@ -1,9 +1,8 @@
-CP2K placeholder text.
-
 What follows is a series of queries for particular kinds of questions of interest that were driven by the needs of CP2K as well as within the \acs{OLCF}.
 This is not intended to be a form of definitive analysis to provide specific solutions to problems, but rather a means to create a few classes of representative queries that we expect to be of general use for any user code or system administration.
 We start with some queries that require only the output from the compiler and thus are immediately compatible with the normal XALT workflow, then proceed to demonstrate the full power of the tool with a more complex query that makes use of all the different sources of information available to the tool.
 However, all of these queries can be easily modified to work on different fields/attributes, combined, or broken apart in any number of ways, as well as made with or without the use of the code sampling frequencies obtained from user profiling to narrow the search space.
+It is worth noting that for added simplicity, we omit the parts of the queries that filter based upon build, application, or profiling IDs as these are unnecessary to understand the queries and also were not designed to be made obvious to end users, who should be provided with a list of their builds in a separate interface (construction of such an interface is outside the scope of this paper).
 
 \subsection{Determining Use of System and User Libraries}
 One of the bigger concerns for system administrators and vendors alike is determining which system resources, particularly that of libraries, are actively being used in applications so as to better direct their focus and efforts.
