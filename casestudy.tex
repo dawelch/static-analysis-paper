@@ -9,7 +9,19 @@ However, all of these queries can be easily modified to work on different fields
 One of the bigger concerns for system administrators and vendors alike is determining which system resources, particularly that of libraries, are actively being used in applications so as to better direct their focus and efforts.
 As such, it is valuable to query not just which libraries are linked in (which has already been done by previous tools like XALT), but also which functions within those libraries are actually getting called within user code.
 To this end, we queried CP2K to discover which \ac{FFTW} functions were actually referenced in the code.
-The results can be seen in Table~\ref{tab:fftw-funcs}
+The query can be seen in Listing~\ref{lst:fftw}, which simply searches all code statements of type 10 (EXEC\_CALL) and joins each one with the \texttt{gfc\_symbol} table on its \texttt{resolved\_sym} field, which is used for referencing the called function's symbol, before finally outputting a sorted list of all distinct names found for symbols originating from the library module \texttt{fftw3\_lib}.
+The results can be seen in Table~\ref{tab:fftw-funcs}.
+
+\begin{lstlisting}[caption=foo, label=lst:fftw]
+select distinct sym.name
+from   gcc.gfc_code as code
+       join gcc.gfc_symbol as sym
+         on sym.record_address = code.resolved_sym
+            and sym.build_id = code.build_id
+where  code.op = 10
+       and sym.module = 'fftw3_lib'
+order  by sym.name;
+\end{lstlisting}
 
 \begin{table}[htbp]
 \caption{FFTW Subroutines Referenced}
@@ -42,6 +54,8 @@ fftw3\_get\_lengths \\
 \hline
 fftw3\_workshare\_execute\_dft \\
 \hline
+fftw\_cleanup \\
+\hline
 fftw\_export\_wisdom\_to\_file \\
 \hline
 fftw\_import\_wisdom\_from\_file \\
@@ -52,6 +66,12 @@ sortint \\
 \label{tab:fftw-funcs}
 \end{center}
 \end{table}
+
+The same general form of query could be narrowed down in a couple other ways as well.
+In addition to filtering function symbols by module(s), one could also filter based on which file(s) they are found in, or even simply by a chosen set of names.
+A user may also want to know more detailed information about invocations, particularly the file/line locations each can be found at.
+Table~\ref{tbl:scalapack-funcs} shows an example of exactly this, showing the file and line number or numbers (when the statement spans multiple lines) found for calls to ScaLAPACK subroutines.
+The results have been limited to the top 15 for brevity.
 
 \begin{table}[htbp]
 \caption{ScaLAPACK Subroutine Reference Locations}
