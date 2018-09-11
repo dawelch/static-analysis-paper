@@ -104,14 +104,14 @@ As such, we must traverse the expression tree for each statement, find the conta
 with recursive expr_tree as (
 	select    code.record_address as code_address,
 	          expr.*
-	from      cp2k_gcc.annotated_code code
-	left join cp2k_gcc.gfc_iterator iter
+	from      gcc.annotated_code code
+	left join gcc.gfc_iterator iter
 	on        iter.record_address = code."ext.iterator"
 	and       iter.build_id = code.build_id
-	left join cp2k_gcc.all_args args
+	left join gcc.all_args args
 	on        args.base_address = code."ext.actual"
 	and       args.build_id = code.build_id
-	join      cp2k_gcc.gfc_expr expr
+	join      gcc.gfc_expr expr
 	on        (
 	                    expr.record_address = code.expr1
 	          or        expr.record_address = code.expr2
@@ -125,10 +125,10 @@ with recursive expr_tree as (
 	select    tree.code_address,
 	          expr.*
 	from      expr_tree tree
-	left join cp2k_gcc.all_args args
+	left join gcc.all_args args
 	on        args.base_address = tree."value.function.actual"
 	and       args.build_id = tree.build_id
-	join      cp2k_gcc.gfc_expr expr
+	join      gcc.gfc_expr expr
 	on        (
 	          	expr.record_address = tree."value.op.op1"
 	          or	expr.record_address = tree."value.op.op2"
