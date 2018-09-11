@@ -1,1 +1,10 @@
-% .25 pages
+With this tool, we are able to gain new insight into applications and explore code and performance data in more ways and with a far finer level of detail than possible with traditional analysis tools.
+While there is already a very large degree of information this tool can provide and an unprecedented degree of flexibility, there are a still lot of directions this work could go, and a number of things necessary to help it get there.
+One of the more notable such tasks is to actually reduce the level of information extracted down to more closely match what is actually utilised by end users as well as create a better and more language agnostic schema designed specifically with the tool in mind.
+Both of these points result from the fact that the tool currently extracts internal C data structures within \acs{GCC} as is, which results in both a number of fields and storage methods for those fields as well as layout across data structures that may not always make quite as much sense for an \acs{SQL} database as it may for C code.
+Additionally, once a mostly or entirely language agnostic schema is created, it can also pave the way toward easily dropping in support for C/C++ applications as well.
+However, the best way to determine which fields are important and create such a schema, more and in-depth real world analysis of code is necessary in order to gain a better idea of what works and is needed.
+
+Another future direction is to reinvestigate polyhedral analysis within the scope of this tool, and determine if and how it could be usefully applied to queries to enhance analysis.
+Additionally, most of the queries we have constructed thus far have still remained confined within the scope of functions, so an alternative direction may be to explore more of an interprocedural analysis route.
+Though this is well known for being a difficult problem to tackle, the level of detail and structure within this tool may provide some unique and unprecedented ways to perform such queries across function boundaries.
