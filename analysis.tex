@@ -55,6 +55,7 @@ That is, a wrapper can be made for \ac{GCC} to intercept compilation and make it
 In addition to the primary data about the code itself, XALT is able to insert a unique identifier into each linked application.
 An additional relation between this link ID and the compilation unit build IDs used for each of the files being linked must be made so that when applications are run, they can be tied back to each of the particular compilations and associated data, which we also need here for connecting the dynamic data at a later stage.
 \subsubsection{Querying the Static Database}
+\label{sec:querying}
 Due to the way we identify records and store object references, we are able to use any columns representing pointers as foreign keys with which to join connected tables in the database.
 One of the most important things we need the database to do for us is associate each code line with file lines.
 A lot of our focus on the analysis is dependent on lines of code, so our queries were constructed so as to be able to clearly relate what file and line numbers are involved in an operation.
