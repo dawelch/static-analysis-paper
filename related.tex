@@ -1,12 +1,7 @@
-% 1/2 page - Oscar
 Research on static analysis of code has a long history, and has both taken many forms and addressed numerous problem domains\cite{Andrade:2012:SAW:2355585.2355593}\cite{1194988}.
-%AS: avoid hyperbole, or even editorializing (very very extremely long history)
-%A key concept to that end is that of dependences between statements, such that the order of statements required to preserve this meaning must remain the same.
-A key challenge is to determine how variables are used and data travels through them in some form of dataflow analysis\cite{Feautrier1991}.
+One key challenge is to determine how variables are used and data travels through them in some form of dataflow analysis\cite{Feautrier1991}.
 This is also commonly used to discover more complicated patterns of memory access, for enabling optimisations such as loop tiling to make better use of cache performance.
-%AS: need some small intro to dynamic analysis here, there is none. Why dynamic, what good for, what extra info it provides, etc. 1-2 sentences.
 Among the more advanced methods compilers use to analyse code is to employ the polyhedral model\cite{Cousot:1978:ADL:512760.512770}\cite{Bagnara:2009:APC:1628316.1628385}\cite{benabderrahmane.10.cc}.
-%you are not British, quit using the British versions of words, lol.
 The polyhedral method is ideally suited for representing and reasoning about loops, although is generally restricted to operating on affine loop nests. 
 In addition, high relative computational expense has traditionally limited its practical use in compilation \cite{DBLP:journals/entcs/Simon10a}.
 Nonetheless, a lot of work has been done on it for more precisely determining dependences \cite{Vasilache:2006:VDA:1183401.1183448} as well as for more advanced optimisation techniques\cite{Nieuwenhuizen2014AutovectorizationUP}\cite{5260526}.
@@ -16,9 +11,9 @@ Static analysis is limited to providing functional data about code (e.g. routine
 For that, it is necessary to actually observe running code through some form of dynamic analysis.
 Various tools have been developed to capture this program information.
 A majority of these tools are not able to combine both static and dynamic program information at the level of detail of our tool to understand characteristics resulting from the structure of the code.
-These tools are not commonly used for application data collection on production systems for several reasons:
+These tools are often not used for application data collection on production systems for several varying reasons:
 \begin{itemize}
-\item They are either not fully automated (i.e. transparent to the user)
+\item They are not fully automated (i.e. transparent to the user)
 \item Have high barriers to entry for users
 \item Are not able to handle full production application code bases
 \item Require significant user intervention (e.g. code restructuring, working with tools experts)
@@ -26,21 +21,19 @@ These tools are not commonly used for application data collection on production 
 \end{itemize}
 
 OpenAnalysis~\cite{Strout:2005}, Program Database Toolkit~\cite{Lindlan2000}, ROSE~\cite{Willcock:2009:RGP:1621607.1621611}, Hercules~\cite{kartsaklis2012hercules}, TSF~\cite{bodin1998user}, RTalk~\cite{SPE:SPE1035}, and CHiLL/Harmony~\cite{tiwari2009scalable} rely on compiler technology to gather program information and most of them are used for code transformations done by tools.
-HPCToolkit's~\cite{Adhianto2010} \texttt{hpcstruct} component gathers some program traits from the binaries of applications by trying to reconstruct specific constructs like loop nests, however it requires reconstructing the programs after optimisations are performed which may not match the original source code or cannot detect the higher level features of languages due to information loss during lowering.
+HPCToolkit's~\cite{Adhianto2010} \texttt{hpcstruct} component gathers some program traits from the binaries of applications by trying to reconstruct specific constructs like loop nests, however it requires reconstructing the programs after optimisations are performed which may not match the original source code or be able to detect the higher level features of languages due to information loss during lowering.
 The Collective Tuning project~\cite{Fursin:2016} aims to create a database of program structure features and find compiler optimisations for performance, power, and code size.
 The main goal is to collect program features for the purpose of feeding these back to the compiler optimiser, instead of being made understandable for human researcher consumption.
 However, it was the efforts of cTuning's Interactive Compilation Interface~\cite{ctuning-ici} project that contributed to adoption of \acs{GCC}'s plugins. 
 
-Dehydra~\cite{dehydra} and Treehydra~\cite{treehydra} are analysis plugins that expose different \ac{GCC} \acp{IR} intended for simple analyses and ``semantic grep'' applications.
+Dehydra~\cite{dehydra} and Treehydra~\cite{treehydra} are analysis plugins that expose different \acs{GCC} \acp{IR} intended for simple analyses and ``semantic grep'' applications.
 Unfortunately, they have only limited Fortran 90 support, and the output hides important application information.
 Pliny~\cite{Feser:2015} is a project that focuses on detecting and fixing errors in programs, as well as synthesising reliable code from high level specifications.
 It relies on mining information and statistics and is both still in the early research stage and not meant for increasing program understanding.
 It also currently doesn't support Fortran.
 
-Finally, tools such as XALT/ALTD~\cite{xalt,xalt2}, PerfTrack~\cite{Karavanic:2005:IDT:1105760.1105804}, Oxbow/PADS~\cite{oxbowpads}, IPM~\cite{5695625}, and HPC system scheduling information provide system environment, linkage information (e.g. for library detection), and runtime and performance information that is complementary to application source code features.
+Finally, tools such as XALT/ALTD~\cite{xalt,xalt2}, PerfTrack~\cite{Karavanic:2005:IDT:1105760.1105804}, Oxbow/PADS~\cite{oxbowpads}, IPM~\cite{5695625}, and \acs{HPC} system scheduling information provide information on the system environment, linkage (e.g. for library detection), and runtime and performance that is complementary to application source code features.
 
 Our focus on utilising the compiler for our static analysis means that we can benefit from the dearth of both static analysis as well as compiler research.
 Compilers face many difficult challenges in transforming code while ensuring that the meaning of the code has not been changed.
 What this means for us is that some of the same methods used to validate transformations can be applied to analysing code, such as for array accesses within loops.
-%AS: Here you sound like you really want to support FORTRAN and that is an important part of your effort, but in the intro, you only say that you used FORTRAN because it was easier. If you want to cash in on this FORTRAN support thing, you need to change the intro part to says something like: "not many of these types of tools support FORTRAN, and here we propose one that does, and also, FORTRAN compiler output happens to be easier to deal with."
-

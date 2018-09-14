@@ -1,11 +1,11 @@
 Emerging HPC platforms are becoming extraordinarily difficult to program as a result of complex, deep and heterogeneous memory hierarchies, heterogeneous cores, and the need to divide work and data among them.
 New programming models and libraries are being developed to aid in porting efforts of application developers, but substantial code restructuring is still necessary to fully make use of these new technologies \cite{anantharaj2013}\cite{titan}.
-To do this effectively, these developers need information about their source code characteristics, together with dynamic (including performance) information to direct their porting / optimisation efforts and make key decisions.
+To do this effectively, these developers need information about their source code characteristics, together with dynamic (including performance) information to direct their porting/optimisation efforts and make key decisions.
 
 %AS: You have repeated the abstract verbatum. This is very poor style and frowned upon. Either change the abstract to be more of a summary of everything, not just an intro-- including conclusions and relevant points from discussion, or change this intro so it's not just a word-for-word repeat of the abstract!
 
 
-Furthermore, considering the potentially costly process of porting applications \cite{larrea2016early}, we need to explore partially or fully automated approaches to optimise existing codes written using de facto programming models.
+Furthermore, considering the potentially costly process of porting applications \cite{larrea2016early}, we need to explore partially or fully automated approaches to optimise existing codes written using legacy programming models.
 On the other side, system administrators also need to understand how users are using system software and resources to exploit modern architectures and how their investment improves the productivity of the users on a platform.
 %AS: This sounds a little malicious, like spying- should maybe add something like "in order to help users optimize their applications' performance"
 
@@ -15,10 +15,10 @@ In this paper we describe a tool that we are constructing in order to provide su
 Instead of focusing on extending programming models to abstract the complexity of these new architectures, we focus on minimally intrusive, low overhead methods implemented via tools for identifying key characteristics and regions of code so that developers may make better decisions regarding what parts of the application to focus their efforts on.
 %AS: run-on sentence, difficult to parse
 Static and dynamic data about applications are collected and stored together in an \acs{SQL} database that can be queried by either a developer or a system administrator.
-This allows us to perform analysis of code by combining information exported from the compiler with supplementary information obtained from a performance sampling tool to better and more finely investigate and reason about code bases of any size in a standard way.
-%AS: why is FORTRAN more simple? Explain.
-This work is currently focused on the analysis of Fortran code because of the lack of Fortran tools, though it can be applied in much the same way to C/C++.
-We will demonstrate the capabilities of this tool via a real-world application-driven case study on the linear-scaling self-consistent field calculation \cite{vandevondele2012linear} from the molecular simulation application CP2K \cite{hutter2014cp2k}.
+This allows us to perform analysis of code by combining information exported from the compiler with supplementary information obtained from a performance analysis tool to better and more finely investigate and reason about code bases of any size in a standard way.
+
+This work is currently focused on the analysis of Fortran code due to the lack of Fortran tools as well as the relative simplicity of its internal representation within \acs{GCC}, though it can be applied in much the same way to C/C++.
+We will demonstrate the capabilities of this tool via a real-world application driven case study on the \ac{LS-SCF} calculation \cite{vandevondele2012linear} from the molecular simulation application CP2K \cite{hutter2014cp2k}.
 %AS: Seems like we need some other citations here, not just the CP2K ones.
 We based our work off of what was being done with XALT \cite{7081224}, with the key differences being the expansion of the level of detail of the data being exported, the ability to integrate static and dynamic information (e.g. profiler output), and a focus on allowing the resulting information to be easily queried by a user or system administrator.
 %TODO forgot where I was going with this; come back and finish the rest of what needs to/should go here
