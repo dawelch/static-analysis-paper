@@ -1,4 +1,7 @@
-With this tool, we are able to gain new insight into applications and explore code and performance data in more ways and with a far finer level of detail than possible with traditional analysis tools.
+With this tool, we are able to gain new insight into applications and explore code and performance data in more ways and with a far finer level of detail than can be achieved with traditional analysis tools.
+For administration, it can provide an easy and automated way of analysing usage patterns, and determining where to focus efforts on infrastructure and support.
+Users can also benefit by using it to explore and analyse their code in a way that may have not been possible before, combining profiling data with structural data on the code to investigate things like memory and data structure usage patterns.
+
 While there is already a very large degree of information this tool can provide and an unprecedented degree of flexibility, there are a still lot of directions this work could go, and a number of things necessary to help it get there.
 One of the more notable such tasks is to actually reduce the level of information extracted down to more closely match what is actually utilised by end users as well as create a better and more language agnostic schema designed specifically with the tool in mind.
 Both of these points result from the fact that the tool currently extracts internal C data structures within \acs{GCC} as is, which results in both a number of fields and storage methods for those fields as well as layout across data structures that may not always make quite as much sense for an \acs{SQL} database as it may for C code.

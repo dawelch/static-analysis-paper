@@ -21,6 +21,10 @@ These tools are often not used for application data collection on production sys
 \end{itemize}
 
 OpenAnalysis~\cite{Strout:2005}, Program Database Toolkit~\cite{Lindlan2000}, ROSE~\cite{Willcock:2009:RGP:1621607.1621611}, Hercules~\cite{kartsaklis2012hercules}, TSF~\cite{bodin1998user}, RTalk~\cite{SPE:SPE1035}, and CHiLL/Harmony~\cite{tiwari2009scalable} rely on compiler technology to gather program information and most of them are used for code transformations done by tools.
+TAU is a toolkit for profiling and tracing parallel C, C++, \ac{UPC}, Fortran, Java, and Python code \cite{Shende:2006:TPP:1125980.1125982}.
+It works by manually, automatically, or dynamically instrumenting functions and statements in code to gather information such as time spent or values of hardware counters, and is capable of event based sampling.
+Score-P is a measurement suite for profiling, event tracing, and online analysis of C, C++, and Fortran applications \cite{10.1007/978-3-642-31476-6_7}.
+Its goal is to simplify the analysis of applications by combining features of multiple performance tools into one, and it supports instrumentation and sampling for many programming paradigms including \acs{MPI}, OpenSHMEM, OpenMP, CUDA, and OpenCL.
 HPCToolkit's~\cite{Adhianto2010} \texttt{hpcstruct} component gathers some program traits from the binaries of applications by trying to reconstruct specific constructs like loop nests, however it requires reconstructing the programs after optimisations are performed which may not match the original source code or be able to detect the higher level features of languages due to information loss during lowering.
 The Collective Tuning project~\cite{Fursin:2016} aims to create a database of program structure features and find compiler optimisations for performance, power, and code size.
 The main goal is to collect program features for the purpose of feeding these back to the compiler optimiser, instead of being made understandable for human researcher consumption.
