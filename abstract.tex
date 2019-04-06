@@ -1,8 +1,9 @@
-Emerging HPC platforms are becoming extraordinarily difficult to program as a result of complex, deep and heterogeneous memory hierarchies, heterogeneous cores, and the need to divide work and data among them.
-New programming models and libraries are being developed to aid in porting efforts of application developers, but substantial code restructuring is still necessary to fully make use of these new technologies.
-To do this effectively, these developers need information about their source code characteristics, including static and dynamic (e.g. performance) information to direct their optimisation efforts and make key decisions.
-On the other hand, system administrators need to understand how users are using the software stack and resources on their systems to understand what software they need to provide to improve the productivity of the users on a platform.
+%We need to change the text to reflect 
+Emerging HPC platforms are becoming extraordinarily difficult to program as a result of systems with diverse architectures, some with different types of memories on the node, the presence of accelerators or multi-cores, some systems with few nodes with multiple accelerators (e.g. fat nodes) and others systems with large number of nodes consisting of CPU multi-cores (thin nodes). New programming models and libraries are being developed to address performance portability challenges and aid in porting efforts of application developers, but substantial code restructuring is still necessary to fully make use of these new technologies in an application performance portable way. 
+To do this effectively, these developers need information about their source code characteristics including static and dynamic (e.g. performance) information to direct their optimisation efforts and make key decisions.
+On the other hand, system administrators need to understand how users are using the software stack and resources on their systems to understand what software they need to provide to improve  productivity of the users on a platform.
 
 In this paper we describe a tool that combines compiler and profiler information to query performance characteristics within an application or across multiple applications on a given platform.
-Static and dynamic data about applications are collected and stored together in an \acs{SQL} database that can be queried by either a developer or a system administrator.
+Static and dynamic data about applications are collected and stored together in an \acs{SQL} database that can be queried by either a developer or a system administrator to study the application characteristics.
+
 We will demonstrate the capabilities of this tool via a real-world example from application-driven case studies that aims at understanding the use of scientific libraries on a routine from the molecular simulation application CP2K.
