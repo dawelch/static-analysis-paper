@@ -7,7 +7,7 @@ However, \ac{AIMD} is able to explore essential chemical properties such as time
 
 Until recently, \ac{AIMD} simulations on systems with thousands of atoms for timescales longer than a few picoseconds was not possible.
 Currently, several parallel implementations of the \ac{DFT} based \ac{SCF} calculation have exploited massive parallelization on supercomputers to obtain the \ac{SCF} based electronic energy of such large systems in under a minute \cite{vasp_bench,kresse1996efficient,cp2k_bench,vandevondele2012linear}.
-This opens up the possibility of simulating, for the first time, electronic-structure-dependent properties as time series extending to hundreds of picoseconds of simulation time, which can be compared to experimental results \cite{gillan2016perspective, pestana2017ab, hassanali2013proton, milovanovic2018new, sellner2013charge}.
+This opens up the possibility of simulating, for the first time, electronic-structure-dependent properties as time series extending to hundreds of picoseconds of simulation time, which can be compared to experimental results \cite{gillan2016perspective,pestana2017ab,hassanali2013proton,milovanovic2018new,sellner2013charge}.
 
 The \ac{LS-SCF} calculation \cite{vandevondele2012linear} in CP2K has made use of an algorithm that exploits physical locality to decompose the \ac{SCF} calculation into what effectively becomes sparse matrix multiplication, which is then approached with their own auto-tuning small matrix multiplication library, \texttt{libsmm} \cite{borvstnik2014sparse}.
 An Intel-optimized version of this library, \texttt{libxsmm}, has also been created for CP2K by programmers working for Intel \cite{heinecke2016libxsmm}.

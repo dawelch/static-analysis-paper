@@ -1,7 +1,4 @@
-\documentclass[letterpaper, 10 pt, conference]{ieeeconf}
-
-\IEEEoverridecommandlockouts
-%\overrideIEEEmargins
+\documentclass[runningheads]{llncs}
 
 %\usepackage{subcaption}
 %\captionsetup{compatibility=false}
@@ -48,20 +45,23 @@
 \title{\LARGE \bf
 A Program Analysis Tool to Query Static and Dynamic Characteristics of HPC Applications
 }
-%\author[1, 2]{Aaron Welch}
-%\author[1]{Ada Sedova}
-%\author[1]{Oscar Hernandez}
-%\author[1]{Terry Jones}
+\titlerunning{A Program Analysis Tool to Query Static and Dynamic Characteristics}
+\author[1, 2]{Aaron Welch}
+\author[1]{Ada Sedova}
+\author[1]{Oscar Hernandez}
+\author[1]{Terry Jones}
 %\author[3]{Thaleia Dimitra Doudali}
 %\author[3]{Ada Gavrilovska}
-%\author[2]{Barbara Chapman}
-%\affil[1]{Oak Ridge National Laboratory, Oak Ridge, TN}
-%\affil[2]{University of Houston, Houston, TX}
+\author[2]{Barbara Chapman}
+\authorrunning{A. Welch et al.}
+\affil[1]{Oak Ridge National Laboratory, Oak Ridge, TN}
+\affil[2]{University of Houston, Houston, TX}
+\affil[3]{Georgia Institute of Technology, Atlanta, GA}
 
 \maketitle
 \begin{abstract}
 \input{abstract}
-%\keywords{static analysis \and dynamic analysis \and databases.}
+\keywords{static analysis \and dynamic analysis \and databases.}
 \end{abstract}
 \section{Introduction}
 \label{sec:intro}
@@ -87,6 +87,6 @@ A Program Analysis Tool to Query Static and Dynamic Characteristics of HPC Appli
 \section*{Acknowledgements}
 \label{sec:ack}
 \input{ack}
-\bibliographystyle{IEEEtran}
+\bibliographystyle{splncs04}
 \bibliography{references}
 \end{document}
