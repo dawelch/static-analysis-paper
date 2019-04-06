@@ -1,0 +1,43 @@
+Research on static analysis of code has a long history, and has both taken many forms and addressed numerous problem domains\cite{Andrade:2012:SAW:2355585.2355593}\cite{1194988}.
+One key challenge is to determine how variables are used and data travels through them in some form of dataflow analysis\cite{Feautrier1991}.
+This is also commonly used to discover more complicated patterns of memory access, for enabling optimisations such as loop tiling to make better use of cache performance.
+Among the more advanced methods compilers use to analyse code is to employ the polyhedral model\cite{Cousot:1978:ADL:512760.512770}\cite{Bagnara:2009:APC:1628316.1628385}\cite{benabderrahmane.10.cc}.
+The polyhedral method is ideally suited for representing and reasoning about loops, although is generally restricted to operating on affine loop nests. 
+In addition, high relative computational expense has traditionally limited its practical use in compilation \cite{DBLP:journals/entcs/Simon10a}.
+Nonetheless, a lot of work has been done on it for more precisely determining dependences \cite{Vasilache:2006:VDA:1183401.1183448} as well as for more advanced optimisation techniques\cite{Nieuwenhuizen2014AutovectorizationUP}\cite{5260526}.
+
+As well researched as static analysis methods are, they cannot provide a comprehensive analysis of applications on their own.
+Static analysis is limited to providing functional data about code (e.g. routine invocations, control/data flow, etc), but can't provide non-functional data (e.g. execution time, hardware counters, etc).
+For that, it is necessary to actually observe running code through some form of dynamic analysis.
+Various tools have been developed to capture this program information.
+A majority of these tools are not able to combine both static and dynamic program information at the level of detail of our tool to understand characteristics resulting from the structure of the code.
+These tools are often not used for application data collection on production systems for several varying reasons:
+\begin{itemize}
+\item They are not fully automated (i.e. transparent to the user)
+\item Have high barriers to entry for users
+\item Are not able to handle full production application code bases
+\item Require significant user intervention (e.g. code restructuring, working with tools experts)
+\item They are not available on all platforms
+\end{itemize}
+
+OpenAnalysis~\cite{Strout:2005}, Program Database Toolkit~\cite{Lindlan2000}, ROSE~\cite{Willcock:2009:RGP:1621607.1621611}, Hercules~\cite{kartsaklis2012hercules}, TSF~\cite{bodin1998user}, RTalk~\cite{SPE:SPE1035}, and CHiLL/Harmony~\cite{tiwari2009scalable} rely on compiler technology to gather program information and most of them are used for code transformations done by tools.
+TAU is a toolkit for profiling and tracing parallel C, C++, \ac{UPC}, Fortran, Java, and Python code \cite{Shende:2006:TPP:1125980.1125982}.
+It works by manually, automatically, or dynamically instrumenting functions and statements in code to gather information such as time spent or values of hardware counters, and is capable of event based sampling.
+Score-P is a measurement suite for profiling, event tracing, and online analysis of C, C++, and Fortran applications \cite{10.1007/978-3-642-31476-6_7}.
+Its goal is to simplify the analysis of applications by combining features of multiple performance tools into one, and it supports instrumentation and sampling for many programming paradigms including \acs{MPI}, OpenSHMEM, OpenMP, CUDA, and OpenCL.
+HPCToolkit's~\cite{Adhianto2010} \texttt{hpcstruct} component gathers some program traits from the binaries of applications by trying to reconstruct specific constructs like loop nests, however it requires reconstructing the programs after optimisations are performed which may not match the original source code or be able to detect the higher level features of languages due to information loss during lowering.
+The Collective Tuning project~\cite{Fursin:2016} aims to create a database of program structure features and find compiler optimisations for performance, power, and code size.
+The main goal is to collect program features for the purpose of feeding these back to the compiler optimiser, instead of being made understandable for human researcher consumption.
+However, it was the efforts of cTuning's Interactive Compilation Interface~\cite{ctuning-ici} project that contributed to adoption of \acs{GCC}'s plugins. 
+
+Dehydra~\cite{dehydra} and Treehydra~\cite{treehydra} are analysis plugins that expose different \acs{GCC} \acp{IR} intended for simple analyses and ``semantic grep'' applications.
+Unfortunately, they have only limited Fortran 90 support, and the output hides important application information.
+Pliny~\cite{Feser:2015} is a project that focuses on detecting and fixing errors in programs, as well as synthesising reliable code from high level specifications.
+It relies on mining information and statistics and is both still in the early research stage and not meant for increasing program understanding.
+It also currently doesn't support Fortran.
+
+Finally, tools such as XALT/ALTD~\cite{xalt,xalt2}, PerfTrack~\cite{Karavanic:2005:IDT:1105760.1105804}, Oxbow/PADS~\cite{oxbowpads}, IPM~\cite{5695625}, and \acs{HPC} system scheduling information provide information on the system environment, linkage (e.g. for library detection), and runtime and performance that is complementary to application source code features.
+
+Our focus on utilising the compiler for our static analysis means that we can benefit from the dearth of both static analysis as well as compiler research.
+Compilers face many difficult challenges in transforming code while ensuring that the meaning of the code has not been changed.
+What this means for us is that some of the same methods used to validate transformations can be applied to analysing code, such as for array accesses within loops.

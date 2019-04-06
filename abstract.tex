@@ -1,6 +1,8 @@
-In moving toward exascale environments, memory hierarchies are becoming increasingly complex and they are expected to become even more so in the future.
-This introduces the difficult problem of addressing how to optimally make use of these hierarchies as well as how to efficiently implement such strategies.
-Typical performance analysis of applications often focuses on compute and I/O resources, however this is no longer adequate for determining how to achieve the greatest use of these emerging architectures.
-Instead, the focus will increasingly need to shift toward analysing memory use, and to this end we look to methods of analysing memory use and determining hotspots in algorithms and data structures.
-We have created a way of performing static analysis by translating a high level compiler \acl{IR} (specifically, the \acl{AST}) to a relational database that we may later query.
-We propose combining this database with information obtained through a traditional dynamic analysis tool in order to determine memory access patterns in a performance portable fashion.
+Emerging HPC platforms are becoming extraordinarily difficult to program as a result of complex, deep and heterogeneous memory hierarchies, heterogeneous cores, and the need to divide work and data among them.
+New programming models and libraries are being developed to aid in porting efforts of application developers, but substantial code restructuring is still necessary to fully make use of these new technologies.
+To do this effectively, these developers need information about their source code characteristics, including static and dynamic (e.g. performance) information to direct their optimisation efforts and make key decisions.
+On the other hand, system administrators need to understand how users are using the software stack and resources on their systems to understand what software they need to provide to improve the productivity of the users on a platform.
+
+In this paper we describe a tool that combines compiler and profiler information to query performance characteristics within an application or across multiple applications on a given platform.
+Static and dynamic data about applications are collected and stored together in an \acs{SQL} database that can be queried by either a developer or a system administrator.
+We will demonstrate the capabilities of this tool via a real-world example from application-driven case studies that aims at understanding the use of scientific libraries on a routine from the molecular simulation application CP2K.

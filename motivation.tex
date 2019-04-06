@@ -1,0 +1,38 @@
+%TODO: cite Titan page, 80/20 percent thing
+According to the center of accelerated application readiness at \acs{ORNL}, 80\% of application porting efforts to OLCF Titan (a \acs{GPU}-based system) was spent understanding and restructuring the code and 20\% on adding a new on-node parallel programming model (e.g. CUDA, OpenMP/OpenACC, etc) \cite{titan}.
+Worse yet is that much of this effort often does not translate well from one application to another, making it a tedious and costly affair.
+We expect this aspect of porting to be equally if not even more burdensome for other and future systems.
+A typical result of this is that many applications do not perform as well as expected or as well as they are able to on other systems, and therefore may not be making full use of the investment in new systems and architectures.
+Ideally, what users want is to be able to swap library implementations in and out across systems in order to port code to multiple platforms better and more efficiently.
+This would allow us to relieve some of the strain placed on application developers in porting their code to future system architectures.
+It also helps in avoiding the need to maintain multiple versions or code paths to support all target architectures, which is another problem that still plagues many applications.
+
+Another issue many applications face is that even after initial porting efforts to use new software and hardware technologies, they may have difficulty with scaling to exploit the full extent of the system and may not use the resources efficiently and obtain the expected performance characteristics.
+It is rarely easy to discover and understand sources of such inefficiencies due both to code and architectural complexity as well as scale.
+As such, being able to quickly and easily investigate large code bases as well as identify inefficienct code patterns is key to application developers being able to port more effectively.
+
+In addition to these concerns, there is typically an issue between users and system administrators regarding determining the needs of the users and how to best provide solutions to those needs.
+Determining usage patterns of various hardware, libraries, tools, new compiler or vendor package features, etc, and where it is most important to focus support efforts, is an issue of great significance to the management of these systems, and there is a lack of tools with which to gauge these patterns.
+While XALT helps bridge this gap, there is still far more it could do to address not just what is used, but how it is used and the resulting degree of impact on applications.
+We expect the level of detail offered by this tool to be able to provide greater insight into such concerns so as to help guide user support efforts.
+
+%TODO: what are other models/libraries/tools doing to address this?
+
+%TODO: OpenMP memory features? (oscar?)
+
+%For example, a CP2K application developer knows that scalapack, a linear algebra library, is linked in his code but doesn't understand how it is being used in its code and how it is affecting the performance of the code on a given system.
+%Ideally, she is interested to know how Scalapack is affecting the performance of a particular solver or calculation and how the parallel communication is affecting the performance on a given system.  
+
+%She noticed that on a particular system Eos (a Xeon Phi based system) her code outperforms a GPU-based system Titan but doesn't know if its related to the implementation of the library, or how it is used in the code.
+%She wants to understand why this is not an easy task as she is observing a lot of  performance difference.
+%She thinks it may be related to the way the library is being invoked in the multi-threaded region of the code or it may be related on the quality of implementation of the library on a given system that favors one architecture over the other. 
+
+%Furthermore, she wants to communicate her scientific library requirements to the system to the system administrator to make sure future systems have the proper library support for her code. 
+ 
+
+
+%One last thing that I wouldn't mind knowing about, if it's possible, is how the code handles openMP vs. MPI use. My benchmarks of this calculation on Eos and Titan showed that using many MPI ranks per node, even 32 on Eos, gave better performance than any use of openMP at all! I thought this was interesting. It's possible that the MPI implementation is really well done and the openMP is not. Or, it could just be something about the calculation itself. I think this is actually a very interesting CS problem.
+
+%Thanks!
+
+%-A
