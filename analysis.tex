@@ -8,7 +8,7 @@ While we include components of a dynamic analysis in this way, we primarily emph
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.4\textwidth]{images/design.png}
+\includegraphics[width=0.9\textwidth]{images/design.png}
 \end{center}
 \caption{Tool Design}
 \label{fig:design}
@@ -45,90 +45,21 @@ Due to the way we identify records and store object references, we are able to u
 One of the most important things we need the database to do for us is associate each code line with file lines.
 A lot of our focus on the analysis is dependent on lines of code, so our queries were constructed so as to be able to clearly relate what file and line numbers are involved in an operation.
 
-%TODO: go through all of this section and make sure there's no confusion between "statements" and "expressions"
-While a full overview of the schema is best left to the compiler's documentation \cite{gcc-docs}, we will briefly detail a few key structures and fields here to give an idea on what kind of information can be queried.
-First, we start with what is referred to as a namespace (internally, \texttt{gfc\_namespace}), which describes the contents of procedures, modules, interfaces, and block constructs.
-Starting from the root, each \texttt{gfc\_namespace} contains references to any contained namespaces, a reference to that namespace's symbol tree (\texttt{gfc\_symtree}), and a reference to the first code statement (\texttt{gfc\_code}) when applicable.
-A code statement is used to represent each individual operation in the code, including assignment, \acs{I/O} operations, conditionals, loops, and function calls.
-Each \texttt{gfc\_code} contains fields for the operation type (\texttt{gfc\_exec\_op}), the location it exists in the code, its symbol tree, its contained expressions (\texttt{gfc\_expr}), references to the next statement (if there is one) and the first statement in the contained block of code it starts (e.g. as in the case of loops), and any supplementary information specific to particular operation types such as iterators, or in the case of OpenMP statements, a reference to another table (\texttt{gfc\_omp\_clauses}) containing information on the clauses.
-Expressions are actually represented as expression trees, where each node contains the type of expression (e.g. constants, variables, arithmetic expressions), its location in the code, its symbol tree, and references to its child expressions (if it isn't a leaf node).
-Finally, each symbol (\texttt{gfc\_symbol}) in a symbol tree contains the symbol's name, type, module/scope, its declaration location, and attributes.
-
-We are able to use the data in these tables to perform the reference counting needed in section~\ref{sec:casestudy}.
-At a high level, we go through each statement for each namespace and look up on which files and lines they occur, traverse the expression trees for those statements, filter for expressions containing references to variables, then finally check the symbol table to determine which particular variables are being referenced.
+We are able to use this data to perform the reference counting needed in section~\ref{sec:casestudy}.
+At a high level, we go through each statement and look up on which files and lines they occur, find all references to variables contained in their expression trees, then finally check the symbol table to determine which particular variables are being referenced.
 We can optionally enhance this further, such as by selecting only variables within particular functions of interest, variables of a particular type, variables being assigned to, and/or variables within OpenMP regions.
 Finally, we can combine the results with that of the dynamic analysis detailed in section~\ref{sec:dynamic} so as to know how many times each line was seen in actual execution.
 In this way, we are then able to construct queries to tally the total number of references observed for every variable across any subset of lines.
 
-This high level overview of a reference counting query hides a number of the difficulties in actually constructing such queries, however, which exist due to the fact that \acs{GCC}'s internal data layout does not perfectly translate to many of the kinds of queries we would like to perform.
-While a full explanation of all of these would be excessive for our purposes here, we will briefly describe a couple such issues to aid in closing the gap for future query examples.
-One of the biggest of these is actually the process of matching up expressions within the code to line numbers and both statements and expressions to namespaces for selecting by function name.
+In order to ease us in the analysis we performed in section~\ref{sec:casestudy}, we created a couple additional virtual tables pieced together from information present in other tables.
+Especially important is \texttt{code\_lines}, designed to aid in the process of matching up expressions within the code to line numbers and to track which lines come from which subroutine.
+Since statements can span multiple lines and source code location is a property of expressions rather than statements, we must traverse the expression tree for each statement, find the containing line for each expression, then propagate it back up in the reverse direction so that it can be aggregated to form the correct line range.
 %TODO: given the explanation of the problem, maybe it'd be better to go back and provide a reference to the parent namespace instead of just one of its fields, similar to expr_tree...
-The reason for this lies in the fact that this information ultimately resides in higher levels - for instance, a \texttt{gfc\_namespace} references a \texttt{gfc\_symbol} containing the name for the namespace, but none of the \texttt{gfc\_code} statements connected to the namespace have any reference back to it.
-Additionally, statements can span across multiple lines in files, but we want to bundle them up and count them as a unit, especially since a profiler will most likely provide just one of them, even though we know that all expressions within a statement will get executed together.
-As such, we created new tables for these structures to provide additional columns with the data we desired, which we had to populate by traversing and processing everything from the top down.
-Since the queries for these are quite involved, a full explanation of all of these would be excessive for our purposes here, so we will instead provide a brief description of each and go through the full query for just one as an example.
+The other such table was \texttt{annotated\_code}, which augments \acs{GCC}'s information on code lines with an additional two fields for the procedure name's symbol and a list of containing OpenMP clauses.
 
-The first of these we refer to as \texttt{annotated\_code}.
-This is identical to \texttt{gfc\_code} with the addition of two fields for the procedure name's symbol and a list of containing OpenMP clauses.
-We construct the data for this by starting at the namespace level and recursively querying the next statements while propagating the namespace's symbol down.
-Additionally, each time a code statement is an OpenMP clause, a reference to it is added to the list of clauses (initially zero) that is passed down to the statements in the containing block, while the current statement's list is propagated to the next statement unmodified.
-
-The next we refer to as \texttt{expr\_tree}.
-This is identical to \texttt{gfc\_expr} with the addition of a single field referencing back up to the \texttt{gfc\_code} containing that expression.
-The full query for creating this information can be seen in Listing~\ref{lst:expr_tree}.
-The sole purpose here is to find all expressions reachable by traversing the code statement.
-We start with the entries in \texttt{annotated\_code}, then left join it with the \texttt{gfc\_iterator} table, causing it link rows in the tables together when they match, or just keep the row on the left (the statement) when they don't and fill the remaining rows with null values (otherwise a join here would filter out all statements that didn't reference an iterator).
-We then similarly left join it with another constructed table we made referred to simply as \texttt{all\_args} which traverses the list of arguments to function call statements and provides all the expressions referenced within.
-Then, we proceed to recursively scan all the expressions from these sources, proceeding down through the expression tree's children ("value.op.op1" and "value.op.op2") until we reach the end.
-Finally, we select all the results for the final table.
-
-The final such table we refer to as \texttt{code\_lines}.
-This is what we use when we want to match statements or expressions to line numbers, as it similarly takes the data from \texttt{annotated\_code} and appends the corresponding file and line numbers to each statement's entry.
-The reason this isn't straightforward or always done is because of the fact that statements can span multiple lines, and we want to check to make sure that the lines containing all referenced expressions are included in the statement's range.
-As such, we must traverse the expression tree for each statement, find the containing line for each expression, then propagate it back up in the reverse direction so that it can be aggregated to form the correct line range.
-
-\begin{lstlisting}[caption=Traversing the Expression Trees, label=lst:expr_tree]
-with recursive expr_tree as (
-	select    code.record_address as code_address,
-	          expr.*
-	from      gcc.annotated_code code
-	left join gcc.gfc_iterator iter
-	on        iter.record_address = code."ext.iterator"
-	and       iter.build_id = code.build_id
-	left join gcc.all_args args
-	on        args.base_address = code."ext.actual"
-	and       args.build_id = code.build_id
-	join      gcc.gfc_expr expr
-	on        (
-	                    expr.record_address = code.expr1
-	          or        expr.record_address = code.expr2
-	          or        expr.record_address = iter.var
-	          or        expr.record_address = iter.start
-	          or        expr.record_address = iter."end"
-	          or        expr.record_address = iter.step
-	          or        expr.record_address = args.expr)
-	and       expr.build_id = code.build_id
-	union all
-	select    tree.code_address,
-	          expr.*
-	from      expr_tree tree
-	left join gcc.all_args args
-	on        args.base_address = tree."value.function.actual"
-	and       args.build_id = tree.build_id
-	join      gcc.gfc_expr expr
-	on        (
-	          	expr.record_address = tree."value.op.op1"
-	          or	expr.record_address = tree."value.op.op2"
-	          or	expr.record_address = args.expr)
-	and       expr.build_id = tree.build_id )
-select expr_tree.*
-from   expr_tree
-\end{lstlisting}
-%where  expr_tree.expr_type <> 2; 
-
-We initially added some polyhedral analysis information to the database by utilising \acsp{GCC} Graphite framework\cite{trifunovic:inria-00551516}, to do some basic reasoning about memory access order for arrays - notably, to find cases where a particular access is likely to result in either a greater or lesser number of cache misses than a typical in order access pattern.
-However, we determined that there were too many issues with it (e.g. finding good loop candidates for analysis) to be practical at this time, so this was left for future work.
+%TODO: keep this or not?
+%We initially added some polyhedral analysis information to the database by utilising \acsp{GCC} Graphite framework\cite{trifunovic:inria-00551516}, to do some basic reasoning about memory access order for arrays - notably, to find cases where a particular access is likely to result in either a greater or lesser number of cache misses than a typical in order access pattern.
+%However, we determined that there were too many issues with it (e.g. finding good loop candidates for analysis) to be practical at this time, so this was left for future work.
 
 \subsection{Dynamic Analysis}
 \label{sec:dynamic}

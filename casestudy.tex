@@ -1,14 +1,18 @@
 What follows is a series of queries for particular kinds of questions of interest that were driven by the needs of CP2K as well as within the \acs{OLCF}.
-This is not intended to be a form of definitive analysis to provide specific solutions to problems, but rather a means to create a few classes of representative queries that we expect to be of general use for any user code or system administration.
-We start with some queries that require only the output from the compiler and thus are immediately compatible with the normal XALT workflow, then proceed to demonstrate the full power of the tool with a more complex query that makes use of all the different sources of information available to the tool.
-However, all of these queries can be easily modified to work on different fields/attributes, combined, or broken apart in any number of ways, as well as made with or without the use of the code sampling frequencies obtained from user profiling to narrow the search space.
-It is worth noting that for added simplicity, we omit the parts of the queries that filter based upon build, application, or profiling IDs as these are unnecessary to understand the queries and also were not designed to be made obvious to end users, who should be provided with a list of their builds in a separate interface (construction of such an interface is outside the scope of this paper).
+This is not intended to be a form of definitive analysis to provide specific solutions to problems, but rather a means to demonstrate queries that we expect to be of general use for \acs{HPC} applications and to provide a greater sense of the manner and level of detail with which code can be queried.
+We start with a query that requires only the output from the compiler and thus is immediately compatible with the normal XALT workflow, then proceed to demonstrate the full power of the tool with some more complex queries that make use of all the different sources of information available to the tool.
+Queries such as these can be easily modified to work on different fields/attributes, combined, or broken apart in any number of ways, as well as made with or without the use of the code sampling frequencies obtained from user profiling to narrow the search space.
+It is worth noting that for added simplicity, we omit the parts of the queries that filter based upon build, application, or profiling IDs as these are unnecessary to understand the queries.
+
+\subsection{CP2K}
+\label{sec:cp2k}
+\input{CP2K}
 
 \subsection{Determining Use of System and User Libraries}
-One of the bigger concerns for system administrators and vendors alike is determining which system resources, particularly that of libraries, are actively being used in applications so as to better direct their focus and efforts.
-As such, it is valuable to query not just which libraries are linked in (which has already been done by previous tools like XALT), but also which functions within those libraries are actually getting called within user code.
+One of the bigger concerns for performance in \acs{HPC} is determining which system resources, particularly that of libraries, are actively being used in applications so as to better direct porting efforts.
+As such, it is valuable to query not just which libraries are linked in (which has already been done by previous tools like XALT), but also which functions within those libraries are actually getting called within user code and where or under what circumstances.
 To this end, we queried CP2K to discover which \ac{FFTW} functions were actually referenced in the code.
-The query can be seen in Listing~\ref{lst:fftw}, which simply searches all code statements of type 10 (EXEC\_CALL) and joins each one with the \texttt{gfc\_symbol} table on its \texttt{resolved\_sym} field, which is used for referencing the called function's symbol, before finally outputting a sorted list of all distinct names found for symbols originating from the library module \texttt{fftw3\_lib}.
+The query can be seen in Listing~\ref{lst:fftw}, which simply searches all code statements of type 10 (EXEC\_CALL) and joins each one with the symbol table on its \texttt{resolved\_sym} field, which is used for referencing the called function's symbol, before finally outputting a sorted list of all distinct names found for symbols originating from the library module \texttt{fftw3\_lib}.
 The results can be seen in Table~\ref{tab:fftw-funcs}.
 
 \begin{lstlisting}[caption=Querying for Use of Library Functions, label=lst:fftw]
@@ -69,7 +73,7 @@ sortint \\
 The same general form of query could be narrowed down in a couple other ways as well.
 In addition to filtering function symbols by module(s), one could also filter based on which file(s) they are found in, or even simply by a chosen set of names.
 A user may also want to know more detailed information about invocations, particularly the file/line locations each can be found at.
-Table~\ref{tbl:scalapack-funcs} shows an example of exactly this, showing the file and line number or numbers (when the statement spans multiple lines) found for calls to ScaLAPACK subroutines.
+Table~\ref{tbl:scalapack-funcs} shows an example of exactly this, showing the file and line numbers found for calls to ScaLAPACK subroutines.
 The results have been limited to the top 15 for brevity.
 
 \begin{table}[htbp]
@@ -161,37 +165,6 @@ src/fm/cp\_cfm\_diag.F & {121,122} & pzheevd \\
 \label{tbl:scalapack-funcs}
 \end{center}
 \end{table}
-
-\subsection{Determining Use of Language/Compiler Features}
-Another aspect of application code that users and administrators alike may want to know is the use and frequency distribution of language and compiler features.
-This can be important for both support contexts (i.e. ensuring that any new language features an application may need are supported and stable), as well as from an interoperability standpoint, where multiple different sources of comingling code may be dependent upon different feature sets.
-It is not unusual to be unsure about which features are being used, as tracking them down can be difficult and they can easily go unnoticed.
-For example, though officially billed as a Fortran 95 application (Section~\ref{sec:cp2k}), when querying CP2K for use of operations exclusive to particular specification versions, we found instances of feature use going all the way up to Fortran 2008.
-The query can be seen in Listing~\ref{lst:fortran-versions}, in which it simply groups all statements by their operation type, and checks them against a table mapping those operation values to the first Fortran version that supported them before tallying up the total for each version.
-The only complicating factor is that there is no already existing table or field that can be used to perform that mapping, so the \texttt{op\_versions} table seen in the query had to be manually created and filled based on documentation.
-The same thing can also be done for other operation types, such as OpenMP or OpenACC compiler features.
-In our case for OpenMP in CP2K, we found that we got a flat distribution consisting only of 2.5 features.
-The results of counting the relative number of uses of language features by version out of all such operations can be seen in Figure~\ref{fig:fortran-versions}.
-While the results consisted of mostly Fortran 95 features and older, a fair amount of both Fortran 2003 and Fortran 2008 operations were also found (0.44\% and 0.06\% of all operations, respectively).
-%TODO: list out some tallies by operation type? I keep wanting to think no, but...
-
-\begin{lstlisting}[caption=Querying for Use of Fortran Language Features, label=lst:fortran-versions]
-select ver.version,
-       count(ver.version)
-from   gcc.gfc_code as code
-       join gcc.op_versions as ver
-         on ver.value = code.op
-group  by ver.version
-order  by count(ver.version) desc;
-\end{lstlisting}
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.4\textwidth]{images/cp2k-fortran-versions.png}
-\end{center}
-\caption{Usage of Language Features by Version}
-\label{fig:fortran-versions}
-\end{figure}
 
 %TODO: NOTES: missing id hacks and omission of ids in listings, interprocedural analysis discussion, library file/module discussion, ...?
 \subsection{Finding OpenMP Regions of Interest}
@@ -285,8 +258,6 @@ build\_core\_ppnl & 2 \\
 \end{center}
 \end{table}
 
-%\subsection{Finding Unnecessary or Inefficient OpenMP Regions}
-
 \subsection{Measuring Variable Use Within OpenMP Parallel Regions}
 
 Finally, we will combine elements of the previous queries to accomplish something truly novel - getting a rough measure of performance for each of hundreds of individual variables in OpenMP regions based on standard profiler sampling and measuring the effects of varying numbers of threads on these measures.
@@ -308,7 +279,7 @@ This may be attributable to startup overhead, though the affected variables meri
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.4\textwidth]{images/cp2k-omp-inc-full.pdf}
+\includegraphics[width=0.9\textwidth]{images/cp2k-omp-inc-full.pdf}
 \end{center}
 \caption{Sampled Reference Counts to Variables Within OpenMP Parallel Regions}
 \label{fig:openmp-refcount}
