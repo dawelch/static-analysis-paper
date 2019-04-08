@@ -1,11 +1,11 @@
-Emerging HPC platforms are becoming extraordinarily difficult to program as a result of complex, deep and heterogeneous memory hierarchies, heterogeneous cores, and the need to divide work and data among them.
-New programming models and libraries are being developed to aid in porting efforts of application developers, but substantial code restructuring is still necessary to fully make use of these new technologies \cite{anantharaj2013}\cite{titan}.
+Emerging HPC platforms are becoming extraordinarily difficult to program as a result of a diverse set of nodes with multicores or accelerators on the node with different types of memories that are avialable on different systems.
+New programming models and libraries that tackle performance portability are being developed to aid in porting efforts of application developers, but substantial code restructuring is still necessary to fully make use of these new programing models \cite{anantharaj2013}\cite{titan}.
 To do this effectively, these developers need information about their source code characteristics, together with dynamic (including performance) information to direct their porting/optimisation efforts and make key decisions.
 
 %AS: You have repeated the abstract verbatum. This is very poor style and frowned upon. Either change the abstract to be more of a summary of everything, not just an intro-- including conclusions and relevant points from discussion, or change this intro so it's not just a word-for-word repeat of the abstract!
 
 
-Furthermore, considering the potentially costly process of porting applications \cite{larrea2016early}, we need to explore partially or fully automated approaches to optimise existing codes written using legacy programming models.
+Furthermore, considering the potentially costly process of porting applications \cite{larrea2016early}, we need to explore partially or fully automated approaches to port applications to multiple platforms and optimise existing codes written using legacy programming models.
 On the other side, system administrators also need to understand how users are using system software and resources to exploit modern architectures and how their investment improves the productivity of the users on a platform.
 %AS: This sounds a little malicious, like spying- should maybe add something like "in order to help users optimize their applications' performance"
 
