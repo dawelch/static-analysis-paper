@@ -6,7 +6,8 @@ Furthermore, considering the potentially costly process of porting applications 
 In this paper we describe a tool that we are constructing in order to provide such information at the level of an application or across multiple applications.
 %AS: system or tool? 
 %again, repeated from abstract
-Instead of focusing on extending programming models to abstract the complexity of these new architectures, we focus on minimally intrusive, low overhead methods implemented via tools for identifying key characteristics and regions of code so that developers may make better decisions regarding what parts of the application to focus their efforts on.
+Instead of focusing on extending programming models to abstract the complexity of these new architectures, we focus on minimally intrusive, low overhead methods implemented via tools for identifying key characteristics and regions of code so that developers may make better decisions on how to restructure their codes for performance portability (e.g. 
+helping tthe user decide which part of the application to focus their efforts on)
 %AS: run-on sentence, difficult to parse
 Static and dynamic data about applications are collected and stored together in an \acs{SQL} database that can be queried by users.
 This allows us to perform analysis of code by combining information exported from the compiler with supplementary information obtained from a performance analysis tool to better and more finely investigate and reason about code bases of any size in a standard way.
