@@ -1,41 +1,40 @@
 Emerging high-performance computing systems are becoming extraordinarily difficult to program as a result of the  
 two new lanes in architectural design:  homogenous and heterogenous, which contain a set of specialized 
 hardware (e.g. new vector units,  accelerator architectures and different types of memories on-node memories). 
-New programming models and libraries that tackle this issue with an emphasis on performance portability are 
-being developed to aid in porting efforts of application developers, but substantial code restructuring is still 
-necessary to fully make use of these new programing models \cite{anantharaj2013}\cite{titan}.
-To do this effectively, these developers need information about their source code characteristics, together with 
-dynamic (including performance) information to direct their porting/optimisation efforts and make key decisions.
+New programming models and libraries are being designed to tackle these issues with an emphasis on performance portability but substantial code restructuring is still 
+necessary to fully make use of these new architectures (e.g. making sure there is enough work to offload to an accelerator, data layout changes, etc) \cite{anantharaj2013}\cite{titan}.
+To do this effectively, developers need information about their source code characteristics, together with 
+dynamic (including performance) information to direct their porting/optimization efforts and make key decisions.
 Furthermore, considering the potentially costly process of porting applications \cite{larrea2016early}, we need to 
-explore partially or fully automated approaches to port applications to multiple platforms and optimise existing 
+explore partially or fully automated approaches to port applications to multiple platforms and optimize existing 
 codes written using legacy programming models.
 
-In this paper we describe a tool that we are constructing in order to provide such information at the level of an 
-application or across multiple applications.
+In this paper we describe a tool to provide such information at the level of an 
+application or across multiple applications that can be used to study their functional characteristics (architecture agnostic) together with platform specific information (e.g. hardware counters, etc).
 %AS: system or tool? 
 %again, repeated from abstract
 Instead of focusing on extending programming models to abstract the complexity of these new architectures, we 
 focus on minimally intrusive, low overhead methods implemented via tools for identifying key characteristics and 
-regions of code so that developers may make better decisions on how to restructure their codes for performance 
+regions of interest in their code so that developers may make better decisions on how to restructure their codes for performance 
 portability (e.g. helping tthe user decide which part of the application to focus their efforts on)
 %AS: run-on sentence, difficult to parse
 Static and dynamic data about applications are collected and stored together in an \acs{SQL} database that can be 
 queried by users.
-This allows us to perform analysis of code by combining information exported from the compiler with 
+This allows us to perform analysis of code by combining information exported from the GNU compiler with 
 supplementary information obtained from a performance analysis tool to better and more finely investigate and 
 reason about code bases of any size in a standard way.
 
-This work is currently focused on the analysis of Fortran code due to the lack of Fortran tools as well as the relative 
+This paper currently focused on the analysis of Fortran code due to the lack of Fortran tools as well as the relative 
 simplicity of its internal representation within \acs{GCC}, though it can be applied in much the same way to C/C++.
 We will demonstrate the capabilities of this tool via a real-world application driven case study on the \ac{LS-SCF} 
 calculation \cite{vandevondele2012linear} from the molecular simulation application CP2K \cite{hutter2014cp2k}.
 %AS: Seems like we need some other citations here, not just the CP2K ones.
-We based our work off of what was being done with XALT \cite{7081224}, with the key differences being the 
-expansion of the level of detail of the data being exported, the ability to integrate static and dynamic information 
+We based our work off of what was being done with XALT \cite{7081224}, a tool used on production systems that captures link time command information to track library usage, with the key differences being the 
+expansion of the level of detail of the data being exported, based on a full intermediate representation of the compilers, the ability to integrate static and dynamic information 
 (e.g. profiler output), and a focus on allowing the resulting information to be easily queried on demand.
 %TODO forgot where I was going with this; come back and finish the rest of what needs to/should go here
 
-The rest of this paper is organised as follows: Section~\ref{sec:motivation} describes the motivation behind the 
+The rest of this paper is organized as follows: Section~\ref{sec:motivation} describes the motivation behind the 
 development of this tool, Section~\ref{sec:related} highlights related work, Section~\ref{sec:analysis} describes in 
 detail the tool and how it works, Section~\ref{sec:casestudy} demonstrates via a case study some of the things our 
 tool can report about code, and Section~\ref{sec:conclusion} provides our conclusions about our work and outlines 
