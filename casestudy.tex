@@ -237,8 +237,8 @@ and	sym.build_id = code_lines.build_id;
 Next, we incorporate the previous query into our search as a subquery, which we will simply refer to 
 as \texttt{subquery} for simplicity.
 This query can be seen in Listing~\ref{lst:omp-search}.
-We decided to search among the functions for those that had high numbers of parallel regions, under 
-the logic that might have the most complex or interesting behaviour.
+We decided to search among the functions for those that had high numbers of OpenMP parallel regions, under 
+the logic that might have the most complex or interesting behavior.
 To do this, we search the \texttt{annotated\_code} table for statements that define OpenMP regions 
 (i.e., have a reference to a \texttt{gfc\_omp\_clauses} entry in their \texttt{ext.omp\_clauses} field) 
 that have an operation type of 75 or 76 (EXEC\_OMP\_PARALLEL and 
