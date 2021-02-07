@@ -1,18 +1,36 @@
-What follows is a series of queries for particular kinds of questions of interest that were driven by the needs of CP2K as well as within the \acs{OLCF}.
-This is not intended to be a form of definitive analysis to provide specific solutions to problems, but rather a means to demonstrate queries that we expect to be of general use for \acs{HPC} applications and to provide a greater sense of the manner and level of detail with which code can be queried.
-We start with a query that requires only the output from the compiler and thus is immediately compatible with the normal XALT workflow, then proceed to demonstrate the full power of the tool with some more complex queries that make use of all the different sources of information available to the tool.
-Queries such as these can be easily modified to work on different fields/attributes, combined, or broken apart in any number of ways, as well as made with or without the use of the code sampling frequencies obtained from user profiling to narrow the search space.
-It is worth noting that for added simplicity, we omit the parts of the queries that filter based upon build, application, or profiling IDs as these are unnecessary to understand the queries.
+What follows is a series of queries for particular kinds of questions of interest for the CP2K 
+application users as well as within the Oak Ridge Leadership Class Facility \acs{OLCF}.
+This is not intended to be a form of definitive analysis to provide specific solutions to problems, but 
+rather a means to demonstrate queries that we expect to be of general use for \acs{HPC} 
+applications and to provide a greater sense of the manner and level of detail with which code can be 
+queried.
+We start with a query that requires only the output from the compiler and thus is immediately 
+compatible with the normal XALT workflow, then proceed to demonstrate the full power of the tool 
+with some more complex queries that make use of all the different sources of information available to 
+the tool.
+Queries such as these can be easily modified to work on different fields/attributes, combined, or 
+broken apart in any number of ways, as well as made with or without the use of the code sampling 
+frequencies obtained from user profiling to narrow the search space.
+It is worth noting that for added simplicity, we omit the parts of the queries that filter based upon 
+build, application, or profiling IDs as these are unnecessary to understand the queries.
 
 \subsection{CP2K}
 \label{sec:cp2k}
 \input{CP2K}
 
 \subsection{Determining Use of System and User Libraries}
-One of the bigger concerns for performance in \acs{HPC} is determining which system resources, particularly that of libraries, are actively being used in applications so as to better direct porting efforts.
-As such, it is valuable to query not just which libraries are linked in (which has already been done by previous tools like XALT), but also which functions within those libraries are actually getting called within user code and where or under what circumstances.
-To this end, we queried CP2K to discover which \ac{FFTW} functions were actually referenced in the code.
-The query can be seen in Listing~\ref{lst:fftw}, which simply searches all code statements of type 10 (EXEC\_CALL) and joins each one with the symbol table on its \texttt{resolved\_sym} field, which is used for referencing the called function's symbol, before finally outputting a sorted list of all distinct names found for symbols originating from the library module \texttt{fftw3\_lib}.
+One of the bigger concerns for performance in \acs{HPC} is determining which system resources, 
+particularly that of libraries, are actively being used in applications so as to better direct porting 
+efforts.
+As such, it is valuable to query not just which libraries are linked in (which has already been done by 
+previous tools like XALT), but also which functions within those libraries are actually getting called 
+within user code and where or under what circumstances.
+To this end, we queried CP2K to discover which \ac{FFTW} functions were actually referenced in the 
+code.
+The query can be seen in Listing~\ref{lst:fftw}, which simply searches all code statements of type 10 
+(EXEC\_CALL) and joins each one with the symbol table on its \texttt{resolved\_sym} field, which is 
+used for referencing the called function's symbol, before finally outputting a sorted list of all distinct 
+names found for symbols originating from the library module \texttt{fftw3\_lib}.
 The results can be seen in Table~\ref{tab:fftw-funcs}.
 
 \begin{lstlisting}[caption=Querying for Use of Library Functions, label=lst:fftw]
@@ -71,9 +89,12 @@ sortint \\
 \end{table}
 
 The same general form of query could be narrowed down in a couple other ways as well.
-In addition to filtering function symbols by module(s), one could also filter based on which file(s) they are found in, or even simply by a chosen set of names.
-A user may also want to know more detailed information about invocations, particularly the file/line locations each can be found at.
-Table~\ref{tbl:scalapack-funcs} shows an example of exactly this, showing the file and line numbers found for calls to ScaLAPACK subroutines.
+In addition to filtering function symbols by module(s), one could also filter based on which file(s) they 
+are found in, or even simply by a chosen set of names.
+A user may also want to know more detailed information about invocations, particularly the file/line 
+locations each can be found at.
+Table~\ref{tbl:scalapack-funcs} shows an example of exactly this, showing the file and line numbers 
+found for calls to ScaLAPACK subroutines.
 The results have been limited to the top 15 for brevity.
 
 \begin{table}[htbp]
@@ -166,14 +187,24 @@ src/fm/cp\_cfm\_diag.F & {121,122} & pzheevd \\
 \end{center}
 \end{table}
 
-%TODO: NOTES: missing id hacks and omission of ids in listings, interprocedural analysis discussion, library file/module discussion, ...?
+%TODO: NOTES: missing id hacks and omission of ids in listings, interprocedural analysis 
+%discussion, library file/module discussion, ...?
 \subsection{Finding OpenMP Regions of Interest}
-Now we look to do something a little more advanced, and incorporate some of our dynamic profiling data to determine where we might want to focus our analysis and/or porting efforts.
-We address this problem in two separate steps - determining the characteristics with which we will select regions of interest, and finding the set of functions observed in our sampling data with which we will restrict our search.
-The second part requires enough to merit its own query here, which can be seen in Listing~\ref{lst:restrict}.
-In this query, we start by selecting all the sampled stack information from our profiler output, located in a table called \texttt{stack\_line\_frequency}.
-We then proceed to ``unnest'' these stacks to get a series of individual file and line tuples, and match the resulting file names to those stored in the database so as to filter out any that weren't included in the original export of data (necessary since source level information is not necessarily available for all functions that may be in the stack, e.g. for external libraries).
-Once we have this, we compare them against any code lines that contain matching line numbers and get the names for the containing functions.
+Now we look to do something a little more advanced, and incorporate some of our dynamic profiling 
+data to determine where we might want to focus our analysis and/or porting efforts.
+We address this problem in two separate steps - determining the characteristics with which we will 
+select regions of interest, and finding the set of functions observed in our sampling data with which 
+we will restrict our search.
+The second part requires enough to merit its own query here, which can be seen in 
+Listing~\ref{lst:restrict}.
+In this query, we start by selecting all the sampled stack information from our profiler output, located 
+in a table called \texttt{stack\_line\_frequency}.
+We then proceed to ``unnest'' these stacks to get a series of individual file and line tuples, and match 
+the resulting file names to those stored in the database so as to filter out any that weren't included in 
+the original export of data (necessary since source level information is not necessarily available for 
+all functions that may be in the stack, e.g. for external libraries).
+Once we have this, we compare them against any code lines that contain matching line numbers and 
+get the names for the containing functions.
 Finally, we eliminate duplicates so that we have a distinct set of all functions sampled.
 
 \begin{lstlisting}[caption=Determing Functions Sampled, label=lst:restrict]
@@ -203,15 +234,24 @@ on	sym.record_address = code_lines.ns_proc_name
 and	sym.build_id = code_lines.build_id;
 \end{lstlisting}
 
-Next, we incorporate the previous query into our search as a subquery, which we will simply refer to as \texttt{subquery} for simplicity.
+Next, we incorporate the previous query into our search as a subquery, which we will simply refer to 
+as \texttt{subquery} for simplicity.
 This query can be seen in Listing~\ref{lst:omp-search}.
-We decided to search among the functions for those that had high numbers of parallel regions, under the logic that might have the most complex or interesting behaviour.
-To do this, we search the \texttt{annotated\_code} table for statements that define OpenMP regions (i.e., have a reference to a \texttt{gfc\_omp\_clauses} entry in their \texttt{ext.omp\_clauses} field) that have an operation type of 75 or 76 (EXEC\_OMP\_PARALLEL and EXEC\_OMP\_PARALLEL\_DO, respectively).
-Finally, we count the number of such regions for each function and filter for only those that both are included in the sampled data and have more than one parallel region, sorting by the number of regions counted.
+We decided to search among the functions for those that had high numbers of parallel regions, under 
+the logic that might have the most complex or interesting behaviour.
+To do this, we search the \texttt{annotated\_code} table for statements that define OpenMP regions 
+(i.e., have a reference to a \texttt{gfc\_omp\_clauses} entry in their \texttt{ext.omp\_clauses} field) 
+that have an operation type of 75 or 76 (EXEC\_OMP\_PARALLEL and 
+EXEC\_OMP\_PARALLEL\_DO, respectively).
+Finally, we count the number of such regions for each function and filter for only those that both are 
+included in the sampled data and have more than one parallel region, sorting by the number of 
+regions counted.
 The results of this query can be seen in Table~\ref{tbl:parallel-regions}.
 
-\begin{lstlisting}[caption=Finding High Concentrations of OpenMP Parallel Regions, label=lst:omp-search]
-select sym.name,
+\begin{lstlisting}[caption=Finding High Concentrations of OpenMP Parallel Regions, 
+label=lst:omp-search]
+select 
+sym.name,
        count(sym.name)
 from   gcc.annotated_code as annotated
        join gcc.gfc_symbol as sym
@@ -260,21 +300,39 @@ build\_core\_ppnl & 2 \\
 
 \subsection{Measuring Variable Use Within OpenMP Parallel Regions}
 
-Finally, we will combine elements of the previous queries to accomplish something truly novel - getting a rough measure of performance for each of hundreds of individual variables in OpenMP regions based on standard profiler sampling and measuring the effects of varying numbers of threads on these measures.
-We accomplish this by using the line-based reference counting described in Section~\ref{sec:querying}, parts of the previous query to both join the static and dynamic data and filter for references occurring within OpenMP regions, as well as the filtering based on function name that we first used for finding ScaLAPACK function calls in Table~\ref{tbl:scalapack-funcs}.
+Finally, we will combine elements of the previous queries to accomplish something truly novel - 
+getting a rough measure of performance for each of hundreds of individual variables in OpenMP 
+regions based on standard profiler sampling and measuring the effects of varying numbers of 
+threads on these measures.
+We accomplish this by using the line-based reference counting described in 
+Section~\ref{sec:querying}, parts of the previous query to both join the static and dynamic data and 
+filter for references occurring within OpenMP regions, as well as the filtering based on function name 
+that we first used for finding ScaLAPACK function calls in Table~\ref{tbl:scalapack-funcs}.
 Thus, we:
 \begin{itemize}
-\item Use the output from MAP to get all the sampled stacks from the application and how many times they were encountered
-\item Match up the file and line numbers to the database to determine which functions those samples occurred in
-\item Select only the samples that were contained within the top few functions of interest (where we observed from profiling that the vast majority of time was spent)
-\item Find all variables referenced on those lines and add the sample count from MAP to a running total for each variable
-\item Group the data together by variable (not lines) and add the counts together for every time each variable was accessed across all relevant lines
+\item Use the output from MAP to get all the sampled stacks from the application and how many 
+times they were encountered
+\item Match up the file and line numbers to the database to determine which functions those samples 
+occurred in
+\item Select only the samples that were contained within the top few functions of interest (where we 
+observed from profiling that the vast majority of time was spent)
+\item Find all variables referenced on those lines and add the sample count from MAP to a running 
+total for each variable
+\item Group the data together by variable (not lines) and add the counts together for every time each 
+variable was accessed across all relevant lines
 \item Repeat for the data obtained from multiple runs with different thread counts (1, 2, 4, and 8)
 \end{itemize}
-The results of this query can be seen in Figure~\ref{fig:openmp-refcount}, where each line represents a single variable and the total number of times any thread accessed it across the observed samples.
-If all parallel regions had a fairly even work distribution across threads and we achieved linear speedup, we might expect to see the corresponding lines in the plot be largely flat, representing roughly the same total number of accesses but with greater numbers of threads making those accesses concurrently.
-This also means that what we don't want to see is deviations resulting in increases to the number of accesses.
-In the plot, we can see that this is the case for a fair number of variables in moving from one to two threads, but that access counts for most variables remain fairly constant afterward.
+The results of this query can be seen in Figure~\ref{fig:openmp-refcount}, where each line 
+represents a single variable and the total number of times any thread accessed it across the 
+observed samples.
+If all parallel regions had a fairly even work distribution across threads and we achieved linear 
+speedup, we might expect to see the corresponding lines in the plot be largely flat, representing 
+roughly the same total number of accesses but with greater numbers of threads making those 
+accesses concurrently.
+This also means that what we don't want to see is deviations resulting in increases to the number of 
+accesses.
+In the plot, we can see that this is the case for a fair number of variables in moving from one to two 
+threads, but that access counts for most variables remain fairly constant afterward.
 This may be attributable to startup overhead, though the affected variables merit closer investigation.
 
 \begin{figure}
