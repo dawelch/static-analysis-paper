@@ -16,13 +16,17 @@ build, application, or profiling IDs as these are unnecessary to understand the 
 \input{CP2K}
 
 \subsection{Determining Use of System and User Libraries}
-One of the bigger concerns for \acs{HPC} applications when targeting a new system is determining which system resources, 
+One of the bigger concerns for \acs{HPC} applications when targeting a new system is determining 
+which system resources, 
 particularly that of libraries, are actively being used in applications so as to better direct porting 
 efforts.
-As such, it is valuable to query not just which libraries are linked in (which has already been done by  tools like XALT), but also the context on which functions within those libraries are actually getting called within user code and their call paths.
+As such, it is valuable to query not just which libraries are linked in (which has already been done by  
+tools like XALT), but also the context on which functions within those libraries are actually getting 
+called within user code and their call paths.
 To this end, we queried CP2K to discover which \ac{FFTW} functions were actually referenced in the 
 code.
-The query can be seen in Listing~\ref{lst:fftw}, which searches for call statements and joins each one with the symbol table on its \texttt{resolved\_sym} field, which is 
+The query can be seen in Listing~\ref{lst:fftw}, which searches for call statements and joins each one 
+with the symbol table on its \texttt{resolved\_sym} field, which is 
 used for referencing the called function's symbol, before finally outputting a sorted list of all distinct 
 names found for symbols originating from the library module \texttt{fftw3\_lib}.
 The results can be seen in Table~\ref{tab:fftw-funcs}.
@@ -184,7 +188,9 @@ src/fm/cp\_cfm\_diag.F & {121,122} & pzheevd \\
 %TODO: NOTES: missing id hacks and omission of ids in listings, interprocedural analysis 
 %discussion, library file/module discussion, ...?
 \subsection{Finding OpenMP Regions of Interest}
-Now we look to do something a little more advanced, and incorporate some of our dynamic profiling 
+Identifying important the important code regions to port to a new architecture is of extreme important  
+for performance and to develop a porting plan to a new architecture.
+This query  incorporate static and some of our dynamic profiling 
 data to determine where we might want to focus our analysis and/or porting efforts.
 We address this problem in two separate steps - determining the characteristics with which we will 
 select regions of interest, and finding the set of functions observed in our sampling data with which 
