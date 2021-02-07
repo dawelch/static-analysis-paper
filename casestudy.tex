@@ -1,16 +1,13 @@
-What follows is a series of queries for particular kinds of questions of interest for the CP2K 
-application users as well as within the Oak Ridge Leadership Class Facility \acs{OLCF}.
-This is not intended to be a form of definitive analysis to provide specific solutions to problems, but 
-rather a means to demonstrate queries that we expect to be of general use for \acs{HPC} 
-applications and to provide a greater sense of the manner and level of detail with which code can be 
-queried.
-We start with a query that requires only the output from the compiler and thus is immediately 
-compatible with the normal XALT workflow, then proceed to demonstrate the full power of the tool 
-with some more complex queries that make use of all the different sources of information available to 
-the tool.
-Queries such as these can be easily modified to work on different fields/attributes, combined, or 
-broken apart in any number of ways, as well as made with or without the use of the code sampling 
-frequencies obtained from user profiling to narrow the search space.
+What follows is a series of queries for particular kinds of questions of interest for CP2K 
+application users as well as within  Oak Ridge Leadership Class Facility \acs{OLCF}.
+This case study is intended to show how the tool can be used to query an application and to 
+demonstrate the level of detail of the queries that can  be of general interest to any \acs{HPC} 
+applications.
+
+Queries such as these can be easily compose to work on different fields/attributes, combined, or 
+broken apart in any number of ways to manipulate the content of the AST, as well as made with or 
+without the use of the dynamic sampling frequencies obtained from user profiling to narrow the 
+search space based on the application hotspots.
 It is worth noting that for added simplicity, we omit the parts of the queries that filter based upon 
 build, application, or profiling IDs as these are unnecessary to understand the queries.
 
@@ -19,16 +16,13 @@ build, application, or profiling IDs as these are unnecessary to understand the 
 \input{CP2K}
 
 \subsection{Determining Use of System and User Libraries}
-One of the bigger concerns for performance in \acs{HPC} is determining which system resources, 
+One of the bigger concerns for \acs{HPC} applications when targeting a new system is determining which system resources, 
 particularly that of libraries, are actively being used in applications so as to better direct porting 
 efforts.
-As such, it is valuable to query not just which libraries are linked in (which has already been done by 
-previous tools like XALT), but also which functions within those libraries are actually getting called 
-within user code and where or under what circumstances.
+As such, it is valuable to query not just which libraries are linked in (which has already been done by  tools like XALT), but also the context on which functions within those libraries are actually getting called within user code and their call paths.
 To this end, we queried CP2K to discover which \ac{FFTW} functions were actually referenced in the 
 code.
-The query can be seen in Listing~\ref{lst:fftw}, which simply searches all code statements of type 10 
-(EXEC\_CALL) and joins each one with the symbol table on its \texttt{resolved\_sym} field, which is 
+The query can be seen in Listing~\ref{lst:fftw}, which searches for call statements and joins each one with the symbol table on its \texttt{resolved\_sym} field, which is 
 used for referencing the called function's symbol, before finally outputting a sorted list of all distinct 
 names found for symbols originating from the library module \texttt{fftw3\_lib}.
 The results can be seen in Table~\ref{tab:fftw-funcs}.
@@ -90,7 +84,7 @@ sortint \\
 
 The same general form of query could be narrowed down in a couple other ways as well.
 In addition to filtering function symbols by module(s), one could also filter based on which file(s) they 
-are found in, or even simply by a chosen set of names.
+are found in, or module
 A user may also want to know more detailed information about invocations, particularly the file/line 
 locations each can be found at.
 Table~\ref{tbl:scalapack-funcs} shows an example of exactly this, showing the file and line numbers 
