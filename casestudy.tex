@@ -1,12 +1,12 @@
 What follows is a series of queries for particular kinds of questions of interest for CP2K 
-application users as well as within  Oak Ridge Leadership Class Facility \acs{OLCF}.
+application users as well as within the \ac{OLCF}.
 This case study is intended to show how the tool can be used to query an application and to 
-demonstrate the level of detail of the queries that can  be of general interest to any \acs{HPC} 
+demonstrate the level of detail of the queries that can be of general interest to any \acs{HPC} 
 applications.
 
-Queries such as these can be easily compose to work on different fields/attributes, combined, or 
-broken apart in any number of ways to manipulate the content of the AST, as well as made with or 
-without the use of the dynamic sampling frequencies obtained from user profiling to narrow the 
+Queries such as these can be easily composed to work on different fields/attributes, combined, or 
+broken apart in any number of ways to manipulate the content of the \ac{IR}, as well as made with or 
+without the use of the dynamic sampling obtained from user profiling to narrow the 
 search space based on the application hotspots.
 It is worth noting that for added simplicity, we omit the parts of the queries that filter based upon 
 build, application, or profiling IDs as these are unnecessary to understand the queries.
@@ -18,8 +18,8 @@ build, application, or profiling IDs as these are unnecessary to understand the 
 %TODO: NOTES: missing id hacks and omission of ids in listings, interprocedural analysis 
 %discussion, library file/module discussion, ...?
 \subsection{Finding OpenMP Regions of Interest}
-Identifying important the important code regions to port to a new architecture is of extreme important  
-for performance and to develop a porting plan to a new architecture.
+Identifying important code regions to port to a new architecture is of extreme importance
+for performance and to develop a porting plan for a new architecture.
 This query incorporates static and some dynamic profiling 
 data to determine where we might want to focus our analysis and/or porting efforts.
 We address this problem in two separate steps - determining the characteristics with which we will 
@@ -68,7 +68,7 @@ Next, we incorporate the previous query into our search as a subquery, which we 
 as \texttt{subquery} for simplicity.
 This query can be seen in Listing~\ref{lst:omp-search}.
 We decided to search among the functions for those that had high numbers of OpenMP parallel regions, under 
-the logic that might have the most complex or interesting behavior.
+the logic that they might have the most complex or interesting behaviour.
 To do this, we search the \texttt{annotated\_code} table for statements that define OpenMP regions 
 (i.e., have a reference to a \texttt{gfc\_omp\_clauses} entry in their \texttt{ext.omp\_clauses} field) 
 that have an operation type of 75 or 76 (EXEC\_OMP\_PARALLEL and 
@@ -179,7 +179,7 @@ which system resources,
 particularly that of libraries, are actively being used in applications so as to better direct porting 
 efforts.
 As such, it is valuable to query not just which libraries are linked in (which has already been done by  
-tools like XALT), but also the context on which functions within those libraries are actually getting 
+tools like XALT), but also the context in which functions within those libraries are actually getting 
 called within user code and their call paths.
 To this end, we queried CP2K to discover which \ac{FFTW} functions were actually referenced in the 
 code.
@@ -246,7 +246,7 @@ sortint \\
 
 The same general form of query could be narrowed down in a couple other ways as well.
 In addition to filtering function symbols by module(s), one could also filter based on which file(s) they 
-are found in, or module
+are found in.
 A user may also want to know more detailed information about invocations, particularly the file/line 
 locations each can be found at.
 Table~\ref{tbl:scalapack-funcs} shows an example of exactly this, showing the file and line numbers 
@@ -361,6 +361,6 @@ These would not ordinarily be easily distinguishable from each other or other pa
 \begin{center}
 \includegraphics[width=0.45\textwidth]{images/library-performance.png}
 \end{center}
-\caption{Percent of Tracing by Library}
+\caption{Percent of Samples by Library}
 \label{fig:library-performance}
 \end{figure}
