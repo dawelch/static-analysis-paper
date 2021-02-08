@@ -154,7 +154,7 @@ variable was accessed across all relevant lines
 \end{itemize}
 The results of this query can be seen in Figure~\ref{fig:openmp-refcount}, where each line 
 represents a single variable and the total number of times any thread accessed it across the 
-observed samples.
+observed samples, adjusted proportionately for thread count.
 If all parallel regions had a fairly even work distribution across threads and we achieved linear 
 speedup, we might expect to see the corresponding lines in the plot be largely flat, representing 
 roughly the same total number of accesses but with greater numbers of threads making those 
@@ -348,10 +348,14 @@ src/fm/cp\_cfm\_diag.F & {121,122} & pzheevd \\
 We have seen that we can check for library subroutine references and determine which ones are actually used as well as where, but what can be even more interesting is determining the respective impact of the libraries on overall execution performance.
 Pairing the information on the stack from tracing with link-time data from XALT, it is possible for us to break down how much of the runtime is spent on code within specific libraries or other component archives of the application.
 In essence, we can pair observed performance metrics with any statically or dynamically linked objects responsible for them in order to gain a better understanding of which libraries/modules have the greatest influence on execution, and direct focus there.
+
 In order to do this, we first must determine in which source file a sample's stack terminates in from the profiling data.
 We can then query the database to find the build IDs generated for those samples and use our previously described integration with XALT to find the corresponding objects they got linked into.
 If we then use these objects as the basis for processing our sample data, we can see which objects dominate performance the most.
 Results of applying this process to CP2K can be seen in Figure~\ref{fig:library-performance}.
+
+This analysis can be particularly valuable for applications like CP2K due to the use and static linking of multiple different projects as libraries internal to the build, like the \ac{DBCSR} library.
+These would not ordinarily be easily distinguishable from each other or other parts of the main application with most alternative analysis methods, making it more difficult to determine what components are responsible for different observed performance characteristics, especially as the number of moving parts increases.
 
 \begin{figure}
 \begin{center}
