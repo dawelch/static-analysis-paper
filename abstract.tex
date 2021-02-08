@@ -2,15 +2,15 @@
 Emerging HPC platforms are becoming more difficult to program as a result of systems with different node 
 architectures, some with a small 
 number of ``fat" heterogenous nodes (consisting of multiple accelerators) and others with a large number of ``thin" 
-homogenous nodes consisting of multi-core \acs{CPU}s connected with high speed interconnects.
+homogenous nodes consisting of multi-core \acsp{CPU} connected with high speed interconnects.
 New programming models are emerging to address performance portability of the 
-applications as well as a set of portable scientific libraries that application can use to exploit these architectures efficiently . 
-To port applications applications to new architectures, developers need information about their source code characteristics including static and dynamic (e.g. 
-performance) information to refactor the code, understand their data and code structure, libraries usage as well as program information to direct their optimization efforts and make key decisions.
+applications as well as a set of scientific libraries that applications can use to exploit these architectures efficiently. 
+To port applications to new architectures, developers need information about their source code characteristics including static and dynamic (e.g. 
+performance) information to refactor the code, understand their data and code structure, libraries usage as well as program information to direct their optimisation efforts and make key decisions.
 In this paper we describe a tool that combines compiler and profiler information to query program 
-characteristics on a given programming environment.
+characteristics in a given programming environment.
 Static and dynamic data about applications is collected and stored together in an \acs{SQL} database that can be 
-later queried to study application characteristics and patterns can be analyzed.
+later queried to study application characteristics and patterns.
 We will demonstrate the capabilities of this tool with an application-driven case study that aims at understanding 
 application code and its use of scientific libraries via a real world example from the molecular simulation application 
 CP2K.

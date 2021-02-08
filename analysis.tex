@@ -1,5 +1,5 @@
 For the automated analysis, rather than exclusively developing our own tools, we relied as much as 
-possible on existing production quality tools available in HPC programming environments.
+possible on existing production quality tools available in \acs{HPC} programming environments.
 Our method extracts data about code directly from the production compiler \acs{GCC}, initially with 
 an exclusive focus on Fortran, and optionally uses a scalable performance analysis tool (Allinea 
 MAP) to obtain information on run-time characteristics.
@@ -24,13 +24,13 @@ These steps will be addressed separately in the following subsections.
 \end{figure}
 
 The result of this analysis allows users (with optional supplementary run-time data) to get answers to 
-questions about applications relevant to their own needs and interests (e.g. porting to a new platform, parallelizing a code, or code maintenance).
+questions about applications relevant to their own needs and interests (e.g. porting to a new platform, parallelising a code, or code maintenance).
 We will demonstrate a few examples of this investigative ability in Section~\ref{sec:casestudy}.
 
 \subsection{Static Analysis}
 For the static analysis, we relied on \acs{GCC} for its support of Fortran.
 Using its plugin \acs{API}, we created a module to be loaded and run after the compiler finishes 
-parsing the code where the abstract syntax tree (AST) is available for the compilation unit..
+parsing the code into its \ac{AST} for the compilation unit.
 The plugin runs through all the relevant data structures in the \ac{AST} representing the code to 
 queue the data, then proceeds to export them all at once in bulk transactions.
 For the database, we used PostgreSQL for some of its advanced query support.
@@ -40,10 +40,10 @@ necessary due to the tables not being intended as a user-facing interface as wel
 focus 
 on Fortran not requiring a new language agnostic schema.
 %TODO: no possessive acronyms... :'(
-Instead, we outputt \acs{GCC}'s internal data structures such that each data structure 
+Instead, we output \acs{GCC}'s internal data structures such that each data structure 
 was a table, and each member of the data structure was a column.
 We currently extract information from 160 \acs{GCC} data structures (tables) consisting of 1014 
-fields (columns) which contains all the information available that the compiler has to represent Fortran program (e.g. symbols, type, storage, scope, statement, expression tables, etc)
+fields (columns) which contains all the information available that the compiler uses to represent Fortran code (e.g. symbols, scope, statements, namespaces, etc)
 Eventually, once enough queries have been made for users, it may then be possible to reduce the 
 level of information down if there is a great enough difference between what is captured and what is 
 actually used, but that is left for future work.
@@ -77,14 +77,17 @@ data at a later stage.
 Due to the way we identify records and store object references, we are able to use any columns 
 representing pointers as foreign keys with which to join connected tables in the database.
 One of the most important things we need the database to do for us is associate each code line with 
-file lines. A lot of our focus on the analysis is dependent mapping the intermediate representation of the program to lines of code, so our queries were 
+file lines. A lot of our focus on the analysis is dependent on mapping the \ac{IR} of the program to lines of code, so our queries were 
 constructed so as to be able to clearly relate what file and line numbers are involved in an operation.
 
 We are able to use this data to perform the reference counting needed in 
 section~\ref{sec:casestudy}.
 At a high level, we go through each statement and look up on which files and lines they occur, find all 
 references to variables contained in their expression trees, then finally check the symbol table to 
-determine which particular variables are being referenced. Similar summary information is available in the debugger tables (e.g. that the compiler uses to generate DWARF at the function level, but it does not have complete line/file number information for expressions including loads and stores operations for a given variable. We can optionally enhance this further, such as by selecting only variables within particular functions 
+determine which particular variables are being referenced.
+%TODO: what does the debug info actually contain?  it certainly doesn't contain what seems to be suggested here, to my knowledge
+%Similar summary information is available in the debugger tables (e.g. that the compiler uses to generate DWARF at the function level, but it does not have complete line/file number information for expressions including loads and stores operations for a given variable.
+We can optionally enhance this further, such as by selecting only variables within particular functions 
 of interest, variables of a particular type, variables being assigned to, and/or variables within 
 OpenMP regions.
 Finally, we can combine the results with that of the dynamic analysis detailed in 
@@ -133,7 +136,8 @@ We use this simple metric to determine in what regions of code the application i
 the time, so that we may focus only upon those regions.
 
 While the static information is output once, the dynamic information can be obtained any desired 
-number of times.This allows for variable parameters to be used to see their influence on the code, 
+number of times.
+This allows for variable parameters to be used to see their influence on the code, 
 such as the number of threads/processes or the problem size. Which profile(s) to use for each 
 analysis report must be specified directly by the user upon requesting the report.
 The tool can then construct a query that links the compile-time and run-time data based upon the 

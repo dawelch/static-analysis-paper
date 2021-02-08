@@ -15,6 +15,164 @@ build, application, or profiling IDs as these are unnecessary to understand the 
 \label{sec:cp2k}
 \input{CP2K}
 
+%TODO: NOTES: missing id hacks and omission of ids in listings, interprocedural analysis 
+%discussion, library file/module discussion, ...?
+\subsection{Finding OpenMP Regions of Interest}
+Identifying important the important code regions to port to a new architecture is of extreme important  
+for performance and to develop a porting plan to a new architecture.
+This query incorporates static and some dynamic profiling 
+data to determine where we might want to focus our analysis and/or porting efforts.
+We address this problem in two separate steps - determining the characteristics with which we will 
+select regions of interest, and finding the set of functions observed in our sampling data with which 
+we will restrict our search.
+The second part requires enough to merit its own query here, which can be seen in 
+Listing~\ref{lst:restrict}.
+In this query, we start by selecting all the sampled stack information from our profiler output, located 
+in a table called \texttt{stack\_line\_frequency}.
+We then proceed to ``unnest'' these stacks to get a series of individual file and line tuples, and match 
+the resulting file names to those stored in the database so as to filter out any that weren't included in 
+the original export of data (necessary since source level information is not necessarily available for 
+all functions that may be in the stack, e.g. for external libraries).
+Once we have this, we compare them against any code lines that contain matching line numbers and 
+get the names for the containing functions.
+Finally, we eliminate duplicates so that we have a distinct set of all functions sampled.
+
+\begin{lstlisting}[caption=Determing Functions Sampled, label=lst:restrict]
+select distinct code_lines.ns_proc_name.name
+from	(
+		select stack_files.file,
+		       stack_lines.line
+		from	(
+				select   files,
+				         lines
+				from     map.stack_line_frequency
+				group by files,
+				         lines limit 1) stack
+		join   unnest(stack.files) with ordinality as stack_files(file, index)
+		on     true
+		join   unnest(stack.lines) with ordinality as stack_lines(line, index)
+		on     stack_lines.index = stack_files.index
+		join	(
+				select distinct filename
+				from            gcc.gfc_file) file
+		on     file.filename = stack_files.file) freq
+join	gcc.code_lines as code_lines
+on	code_lines.filename = freq.file
+and	code_lines.lines @> array[freq.line]
+join	gcc.gfc_symbol as sym
+on	sym.record_address = code_lines.ns_proc_name
+and	sym.build_id = code_lines.build_id;
+\end{lstlisting}
+
+Next, we incorporate the previous query into our search as a subquery, which we will simply refer to 
+as \texttt{subquery} for simplicity.
+This query can be seen in Listing~\ref{lst:omp-search}.
+We decided to search among the functions for those that had high numbers of OpenMP parallel regions, under 
+the logic that might have the most complex or interesting behavior.
+To do this, we search the \texttt{annotated\_code} table for statements that define OpenMP regions 
+(i.e., have a reference to a \texttt{gfc\_omp\_clauses} entry in their \texttt{ext.omp\_clauses} field) 
+that have an operation type of 75 or 76 (EXEC\_OMP\_PARALLEL and 
+EXEC\_OMP\_PARALLEL\_DO, respectively).
+Finally, we count the number of such regions for each function and filter for only those that both are 
+included in the sampled data and have more than one parallel region, sorting by the number of 
+regions counted.
+The results of this query can be seen in Table~\ref{tbl:parallel-regions}.
+
+\begin{lstlisting}[caption=Finding High Concentrations of OpenMP Parallel Regions, 
+label=lst:omp-search]
+select 
+sym.name,
+       count(sym.name)
+from   gcc.annotated_code as annotated
+       join gcc.gfc_symbol as sym
+         on sym.record_address = annotated.ns_proc_name
+            and sym.build_id = annotated.build_id
+where  annotated."ext.omp_clauses" is not null
+       and annotated.op in ( 75, 76 )
+       and sym.name in (select *
+                        from   subquery)
+group  by sym.name
+having count(sym.name) > 1
+order  by count(sym.name) desc;  
+\end{lstlisting}
+
+\begin{table}[htbp]
+\caption{Subroutines with High Numbers of OpenMP Parallel Regions}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Subroutine} & \textbf{Parallel Regions} \\
+\hline
+pw\_axpy & 14 \\
+\hline
+xc\_vxc\_pw\_create & 10 \\
+\hline
+pw\_copy & 8 \\
+\hline
+pw\_scatter\_s & 4 \\
+\hline
+rs\_pw\_transfer & 4 \\
+\hline
+dbcsr\_data\_copyall & 4 \\
+\hline
+multiply\_cannon & 4 \\
+\hline
+pw\_gather\_s & 2 \\
+\hline
+dbcsr\_multiply\_generic & 2 \\
+\hline
+build\_core\_ppnl & 2 \\
+\hline
+\end{tabular}
+\label{tbl:parallel-regions}
+\end{center}
+\end{table}
+
+\subsection{Measuring Variable Use Within OpenMP Parallel Regions}
+
+Finally, we will combine elements of the previous queries to accomplish something truly novel - 
+getting a rough measure of performance for each of hundreds of individual variables in OpenMP 
+regions based on standard profiler sampling and measuring the effects of varying numbers of 
+threads on these measures.
+We accomplish this by using the line-based reference counting described in 
+Section~\ref{sec:querying}, parts of the previous query to both join the static and dynamic data and 
+filter for references occurring within OpenMP regions, as well as the filtering based on function name 
+that we first used for finding ScaLAPACK function calls in Table~\ref{tbl:scalapack-funcs}.
+Thus, we:
+\begin{itemize}
+\item Use the output from MAP to get all the sampled stacks from the application and how many 
+times they were encountered
+\item Match up the file and line numbers to the database to determine which functions those samples 
+occurred in
+\item Select only the samples that were contained within the top few functions of interest (where we 
+observed from profiling that the vast majority of time was spent)
+\item Find all variables referenced on those lines and add the sample count from MAP to a running 
+total for each variable
+\item Group the data together by variable (not lines) and add the counts together for every time each 
+variable was accessed across all relevant lines
+\item Repeat for the data obtained from multiple runs with different thread counts (1, 2, 4, and 8)
+\end{itemize}
+The results of this query can be seen in Figure~\ref{fig:openmp-refcount}, where each line 
+represents a single variable and the total number of times any thread accessed it across the 
+observed samples.
+If all parallel regions had a fairly even work distribution across threads and we achieved linear 
+speedup, we might expect to see the corresponding lines in the plot be largely flat, representing 
+roughly the same total number of accesses but with greater numbers of threads making those 
+accesses concurrently.
+This also means that what we don't want to see is deviations resulting in increases to the number of 
+accesses.
+In the plot, we can see that this is the case for a fair number of variables in moving from one to two 
+threads, but that access counts for most variables remain fairly constant afterward.
+This may be attributable to startup overhead, though the affected variables merit closer investigation.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.45\textwidth]{images/cp2k-omp-inc-full.pdf}
+\end{center}
+\caption{Sampled Reference Counts to Variables Within OpenMP Parallel Regions}
+\label{fig:openmp-refcount}
+\end{figure}
+
 \subsection{Determining Use of System and User Libraries}
 One of the bigger concerns for \acs{HPC} applications when targeting a new system is determining 
 which system resources, 
@@ -185,160 +343,20 @@ src/fm/cp\_cfm\_diag.F & {121,122} & pzheevd \\
 \end{center}
 \end{table}
 
-%TODO: NOTES: missing id hacks and omission of ids in listings, interprocedural analysis 
-%discussion, library file/module discussion, ...?
-\subsection{Finding OpenMP Regions of Interest}
-Identifying important the important code regions to port to a new architecture is of extreme important  
-for performance and to develop a porting plan to a new architecture.
-This query  incorporate static and some of our dynamic profiling 
-data to determine where we might want to focus our analysis and/or porting efforts.
-We address this problem in two separate steps - determining the characteristics with which we will 
-select regions of interest, and finding the set of functions observed in our sampling data with which 
-we will restrict our search.
-The second part requires enough to merit its own query here, which can be seen in 
-Listing~\ref{lst:restrict}.
-In this query, we start by selecting all the sampled stack information from our profiler output, located 
-in a table called \texttt{stack\_line\_frequency}.
-We then proceed to ``unnest'' these stacks to get a series of individual file and line tuples, and match 
-the resulting file names to those stored in the database so as to filter out any that weren't included in 
-the original export of data (necessary since source level information is not necessarily available for 
-all functions that may be in the stack, e.g. for external libraries).
-Once we have this, we compare them against any code lines that contain matching line numbers and 
-get the names for the containing functions.
-Finally, we eliminate duplicates so that we have a distinct set of all functions sampled.
+\subsection{Determining Performance Impact of Libraries}
 
-\begin{lstlisting}[caption=Determing Functions Sampled, label=lst:restrict]
-select distinct code_lines.ns_proc_name.name
-from	(
-		select stack_files.file,
-		       stack_lines.line
-		from	(
-				select   files,
-				         lines
-				from     map.stack_line_frequency
-				group by files,
-				         lines limit 1) stack
-		join   unnest(stack.files) with ordinality as stack_files(file, index)
-		on     true
-		join   unnest(stack.lines) with ordinality as stack_lines(line, index)
-		on     stack_lines.index = stack_files.index
-		join	(
-				select distinct filename
-				from            gcc.gfc_file) file
-		on     file.filename = stack_files.file) freq
-join	gcc.code_lines as code_lines
-on	code_lines.filename = freq.file
-and	code_lines.lines @> array[freq.line]
-join	gcc.gfc_symbol as sym
-on	sym.record_address = code_lines.ns_proc_name
-and	sym.build_id = code_lines.build_id;
-\end{lstlisting}
-
-Next, we incorporate the previous query into our search as a subquery, which we will simply refer to 
-as \texttt{subquery} for simplicity.
-This query can be seen in Listing~\ref{lst:omp-search}.
-We decided to search among the functions for those that had high numbers of OpenMP parallel regions, under 
-the logic that might have the most complex or interesting behavior.
-To do this, we search the \texttt{annotated\_code} table for statements that define OpenMP regions 
-(i.e., have a reference to a \texttt{gfc\_omp\_clauses} entry in their \texttt{ext.omp\_clauses} field) 
-that have an operation type of 75 or 76 (EXEC\_OMP\_PARALLEL and 
-EXEC\_OMP\_PARALLEL\_DO, respectively).
-Finally, we count the number of such regions for each function and filter for only those that both are 
-included in the sampled data and have more than one parallel region, sorting by the number of 
-regions counted.
-The results of this query can be seen in Table~\ref{tbl:parallel-regions}.
-
-\begin{lstlisting}[caption=Finding High Concentrations of OpenMP Parallel Regions, 
-label=lst:omp-search]
-select 
-sym.name,
-       count(sym.name)
-from   gcc.annotated_code as annotated
-       join gcc.gfc_symbol as sym
-         on sym.record_address = annotated.ns_proc_name
-            and sym.build_id = annotated.build_id
-where  annotated."ext.omp_clauses" is not null
-       and annotated.op in ( 75, 76 )
-       and sym.name in (select *
-                        from   subquery)
-group  by sym.name
-having count(sym.name) > 1
-order  by count(sym.name) desc;  
-\end{lstlisting}
-
-\begin{table}[htbp]
-\caption{Subroutines with High Numbers of OpenMP Parallel Regions}
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-\textbf{Subroutine} & \textbf{Parallel Regions} \\
-\hline
-pw\_axpy & 14 \\
-\hline
-xc\_vxc\_pw\_create & 10 \\
-\hline
-pw\_copy & 8 \\
-\hline
-pw\_scatter\_s & 4 \\
-\hline
-rs\_pw\_transfer & 4 \\
-\hline
-dbcsr\_data\_copyall & 4 \\
-\hline
-multiply\_cannon & 4 \\
-\hline
-pw\_gather\_s & 2 \\
-\hline
-dbcsr\_multiply\_generic & 2 \\
-\hline
-build\_core\_ppnl & 2 \\
-\hline
-\end{tabular}
-\label{tbl:parallel-regions}
-\end{center}
-\end{table}
-
-\subsection{Measuring Variable Use Within OpenMP Parallel Regions}
-
-Finally, we will combine elements of the previous queries to accomplish something truly novel - 
-getting a rough measure of performance for each of hundreds of individual variables in OpenMP 
-regions based on standard profiler sampling and measuring the effects of varying numbers of 
-threads on these measures.
-We accomplish this by using the line-based reference counting described in 
-Section~\ref{sec:querying}, parts of the previous query to both join the static and dynamic data and 
-filter for references occurring within OpenMP regions, as well as the filtering based on function name 
-that we first used for finding ScaLAPACK function calls in Table~\ref{tbl:scalapack-funcs}.
-Thus, we:
-\begin{itemize}
-\item Use the output from MAP to get all the sampled stacks from the application and how many 
-times they were encountered
-\item Match up the file and line numbers to the database to determine which functions those samples 
-occurred in
-\item Select only the samples that were contained within the top few functions of interest (where we 
-observed from profiling that the vast majority of time was spent)
-\item Find all variables referenced on those lines and add the sample count from MAP to a running 
-total for each variable
-\item Group the data together by variable (not lines) and add the counts together for every time each 
-variable was accessed across all relevant lines
-\item Repeat for the data obtained from multiple runs with different thread counts (1, 2, 4, and 8)
-\end{itemize}
-The results of this query can be seen in Figure~\ref{fig:openmp-refcount}, where each line 
-represents a single variable and the total number of times any thread accessed it across the 
-observed samples.
-If all parallel regions had a fairly even work distribution across threads and we achieved linear 
-speedup, we might expect to see the corresponding lines in the plot be largely flat, representing 
-roughly the same total number of accesses but with greater numbers of threads making those 
-accesses concurrently.
-This also means that what we don't want to see is deviations resulting in increases to the number of 
-accesses.
-In the plot, we can see that this is the case for a fair number of variables in moving from one to two 
-threads, but that access counts for most variables remain fairly constant afterward.
-This may be attributable to startup overhead, though the affected variables merit closer investigation.
+We have seen that we can check for library subroutine references and determine which ones are actually used as well as where, but what can be even more interesting is determining the respective impact of the libraries on overall execution performance.
+Pairing the information on the stack from tracing with link-time data from XALT, it is possible for us to break down how much of the runtime is spent on code within specific libraries or other component archives of the application.
+In essence, we can pair observed performance metrics with any statically or dynamically linked objects responsible for them in order to gain a better understanding of which libraries/modules have the greatest influence on execution, and direct focus there.
+In order to do this, we first must determine in which source file a sample's stack terminates in from the profiling data.
+We can then query the database to find the build IDs generated for those samples and use our previously described integration with XALT to find the corresponding objects they got linked into.
+If we then use these objects as the basis for processing our sample data, we can see which objects dominate performance the most.
+Results of applying this process to CP2K can be seen in Figure~\ref{fig:library-performance}.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.45\textwidth]{images/cp2k-omp-inc-full.pdf}
+\includegraphics[width=0.45\textwidth]{images/library-performance.png}
 \end{center}
-\caption{Sampled Reference Counts to Variables Within OpenMP Parallel Regions}
-\label{fig:openmp-refcount}
+\caption{Percent of Tracing by Library}
+\label{fig:library-performance}
 \end{figure}

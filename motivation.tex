@@ -1,22 +1,22 @@
 %TODO: cite Titan page, 80/20 percent thing
 According to the center of accelerated application readiness at \acs{ORNL}, 80\% of application porting efforts 
 to systems like OLCF Titan (a \acs{GPU}-based system) was spent understanding and restructuring the code and 20\% on 
-adding a new on-node parallel programming model (e.g. CUDA, OpenMP/OpenACC, etc) \cite{titan}. Similar experience was reported Summit system that has six GPUs per node.  
+adding a new on-node parallel programming model (e.g. CUDA, OpenMP/OpenACC, etc) \cite{titan}. Similar experience was reported on the Summit system that has six \acsp{GPU} per node.  
 Worse yet is that much of this effort often does not translate well from one application to another, making it a 
 tedious and costly process.
 We expect this aspect of porting to be equally if not even more burdensome on future systems with extreme heterogeneity to manage their power constraints.  A typical result of this is that many applications do not perform as well as expected or as well as they are able 
 to on other systems, and therefore may not be making full use of new systems and architectures.
-Ideally, what users want is to be able to use a performance portable programming model (implemented with high-level parallel abstractions that a compiler can optimized) and swap library implementations in and out across systems without 
+Ideally, what users want is to be able to use a performance portable programming model (implemented with high-level abstractions) and swap library implementations between systems without 
 sacrificing performance considerations in order to port code to multiple platforms better and more efficiently.
 This would relieve some of the strain placed on application developers in porting their code to 
-future system architectures and avoidthe need to maintain multiple versions or code paths to support all target architectures, 
+future system architectures and avoid the need to maintain multiple versions or code paths to support all target architectures, 
 which is another problem that still plagues many applications.
 
 Another issue many applications face is that even after initial porting efforts to use new software and hardware 
 technologies, they may have difficulty with scaling to exploit the full extent of the system and may not use the 
 resources efficiently and obtain the expected performance characteristics.
 It is rarely easy to discover and understand sources of such inefficiencies due both to code and architectural 
-complexity as well as scale. New types of work and data decompositions may be needed be explore depending on the scaling of the application where new levels of parallelism need to be exploited (e.g. finding regions of code that can be efficiently offloaded to an accelerator as the per node problem size changes at scale (e.g. strong scaling). As such, being able to quickly and easily investigate large code bases as well as identify inefficient code 
+complexity as well as scale. New types of work and data decompositions may be needed to be explored depending on the scaling of the application where new levels of parallelism need to be exploited (e.g. finding regions of code that can be efficiently offloaded to an accelerator). As such, being able to quickly and easily investigate large code bases as well as identify inefficient code 
 patterns is key to application developers being able to port more effectively.
 
 Determining usage patterns of various hardware, libraries, tools, new compiler or vendor package features, 
